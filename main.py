@@ -38,6 +38,10 @@ def main(config: str, verbose: bool):
         logger = setup_logging(config_data, verbose)
 
         interviewer = Interviewer(config=config_data, name="User")
+
+        # seed_question_pool: k questions, k reference answers
+        # interviewer.seed_questions = [{"question": "What is your name?", "answer": "System"}] * 10
+
         student = Interviewee(config=config_data, name="System")
 
         interview = InterviewRunner(interviewer, student, config_data, logger, console)

@@ -2,6 +2,23 @@
 Interview Process implemented in Swarm. Will be integrated with interview-eval in the future.
 
 
+### Requirements
+
+- Modifying problem
+  - Python function to modify the problem `modify_problem`
+  - Supported strategies: `Unclarifying`, `Paraphrasing`, and `Modifying` (given seed question, create a new question)
+
+- Feedback & Editing Loop
+  - Proceed to next question if the response is graded as `Good`
+  - 이전에 했던 feedback 주지 말기
+
+- Followup Questions
+  - Problem, Response, Feedback, Followup Question, Response, Feedback, Followup Question, ...
+
+- Report Card
+  - Per seed questions pool
+  - Include information about the student's performance on each question that received different scores
+
 ### Managing submodules
 
 ```bash
