@@ -22,6 +22,7 @@ Interview Process implemented in Swarm. Will be integrated with interview-eval i
 
 - [ ] More strict loading of config.yaml (e.g. check if all required fields are present)
 - [ ] Add documentation for the code
+- [ ] Support interview_type: "base", "adaptive"
 
 ### Managing submodules
 
