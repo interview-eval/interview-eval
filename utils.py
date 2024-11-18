@@ -1,10 +1,11 @@
 import logging
-from pathlib import Path
 from datetime import datetime
-from rich.logging import RichHandler
-from rich.console import Console
-from rich.theme import Theme
+from pathlib import Path
+
 import yaml
+from rich.console import Console
+from rich.logging import RichHandler
+from rich.theme import Theme
 
 # Custom theme for rich
 custom_theme = Theme(

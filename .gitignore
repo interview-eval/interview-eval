@@ -1,5 +1,5 @@
-# Created by https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks,macos,windows,linux
-# Edit at https://www.toptal.com/developers/gitignore?templates=python,jupyternotebooks,macos,windows,linux
+# Created by https://www.toptal.com/developers/gitignore/api/python,windows,macos,linux,jupyternotebooks
+# Edit at https://www.toptal.com/developers/gitignore?templates=python,windows,macos,linux,jupyternotebooks
 
 .env
 
@@ -260,4 +260,4 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# End of https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks,macos,windows,linux
+# End of https://www.toptal.com/developers/gitignore/api/python,windows,macos,linux,jupyternotebooks

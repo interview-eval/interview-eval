@@ -1,10 +1,12 @@
-from typing import Optional, Dict, Any
-from swarm import Swarm, Agent, Result
+import logging
+from typing import Any, Dict, Optional
+
+import yaml
 from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
-import logging
-import yaml
+
+from swarm import Agent, Result, Swarm
 
 
 class Interviewer(Agent):
@@ -22,10 +24,8 @@ class Interviewer(Agent):
             + f"\nStrategy:\n{yaml.dump(interviewer_config['strategy'], default_flow_style=False)}"
         )
 
-        super().__init__(
-            name=name, instructions=instructions, functions=[self.conclude_interview]
-        )
-    
+        super().__init__(name=name, instructions=instructions, functions=[self.conclude_interview])
+
     def conclude_interview(self, score: int, comments: str) -> Result:
         """Conclude the interview with final score and comments."""
         return Result(
@@ -66,7 +66,7 @@ class InterviewRunner:
         self.logger = logger
         self.console = console
         self.questions_count = 0
-        self.max_questions = config["session"].get("max_questions", 10) # Default to 10 questions if not specified
+        self.max_questions = config["session"].get("max_questions", 10)  # Default to 10 questions if not specified
 
     def display_message(self, agent_name: str, content: str):
         """Display a message with proper formatting."""
@@ -124,22 +124,14 @@ class InterviewRunner:
             transient=True,
         ) as progress:
             task = progress.add_task("Processing response...", total=None)
-            response = self.client.run(
-                agent=self.interviewee, messages=messages, context_variables=context
-            )
+            response = self.client.run(agent=self.interviewee, messages=messages, context_variables=context)
 
         self.display_message(response.agent.name, response.messages[-1]["content"])
 
         while not response.context_variables.get("interview_complete", False):
             # Check if max questions limit has been reached
-            messages = response.messages + [
-                {"role": "user", "content": response.messages[-1]["content"]}
-            ]
-            next_agent = (
-                self.interviewer
-                if response.agent == self.interviewee
-                else self.interviewee
-            )
+            messages = response.messages + [{"role": "user", "content": response.messages[-1]["content"]}]
+            next_agent = self.interviewer if response.agent == self.interviewee else self.interviewee
 
             if next_agent == self.interviewer:
                 self.questions_count += 1
@@ -162,19 +154,14 @@ class InterviewRunner:
 
             if response.agent == self.interviewee and self.questions_count >= self.max_questions:
                 # Force conclude the interview
-                final_message = (
-                    "Maximum number of questions reached. Concluding interview."
-                )
+                final_message = "Maximum number of questions reached. Concluding interview."
                 self.console.print(f"\n[warning]{final_message}[/warning]")
                 response = self.client.run(
                     agent=self.interviewer,
-                    messages=messages
-                    + [{"role": "system", "content": response.messages[-1]["content"]}],
+                    messages=messages + [{"role": "system", "content": response.messages[-1]["content"]}],
                     context_variables={"force_conclude": True},
                 )
-                self.display_message(
-                    response.agent.name, response.messages[-1]["content"]
-                )
+                self.display_message(response.agent.name, response.messages[-1]["content"])
                 break
 
         results = {

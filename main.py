@@ -1,8 +1,9 @@
 import click
-from rich.panel import Panel
 from dotenv import load_dotenv
-from interview import Interviewer, Interviewee, InterviewRunner
-from utils import setup_logging, load_config, console
+from rich.panel import Panel
+
+from interview import Interviewee, Interviewer, InterviewRunner
+from utils import console, load_config, setup_logging
 
 load_dotenv()
 
@@ -26,8 +27,7 @@ def main(config: str, verbose: bool):
     # Show welcome message
     console.print(
         Panel(
-            "[green]Automated Interview System[/green]\n"
-            "[cyan]Use Ctrl+C to exit at any time[/cyan]",
+            "[green]Automated Interview System[/green]\n" "[cyan]Use Ctrl+C to exit at any time[/cyan]",
             border_style="green",
             padding=(1, 2),
         )
