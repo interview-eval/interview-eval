@@ -24,10 +24,8 @@ __CTX_VARS_NAME__ = "context_variables"
 
 
 class Swarm:
-    def __init__(self, client=None):
-        if not client:
-            client = OpenAI()
-        self.client = client
+    def __init__(self):
+        pass
 
     def get_chat_completion(
         self,
@@ -58,11 +56,11 @@ class Swarm:
             "tool_choice": agent.tool_choice,
             "stream": stream,
         }
-
+        
         if tools:
             create_params["parallel_tool_calls"] = agent.parallel_tool_calls
 
-        return self.client.chat.completions.create(**create_params)
+        return agent.client.chat.completions.create(**create_params)
 
     def handle_function_result(self, result, debug) -> Result:
         match result:

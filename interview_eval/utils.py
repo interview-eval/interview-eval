@@ -1,8 +1,11 @@
 import logging
+import os
+import re
 from datetime import datetime
 from pathlib import Path
 
 import yaml
+from dotenv import load_dotenv
 from rich.console import Console
 from rich.logging import RichHandler
 from rich.theme import Theme
@@ -46,6 +49,16 @@ def setup_logging(config: dict, verbose: bool) -> logging.Logger:
 
 
 def load_config(config_path: str) -> dict:
-    """Load configuration from YAML file."""
+    """Load configuration from YAML file with environment variable support."""
+    load_dotenv()
+
     with open(config_path, "r") as file:
-        return yaml.safe_load(file)
+        content = file.read()
+        # Replace ${VAR} with environment variables
+        env_vars = re.findall(r"\${([^}]+)}", content)
+        for var in env_vars:
+            env_value = os.getenv(var)
+            if env_value:
+                content = content.replace(f"${{{var}}}", env_value)
+
+    return yaml.safe_load(content)

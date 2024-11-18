@@ -1,5 +1,6 @@
 from typing import Callable, List, Optional, Union
 
+from openai import OpenAI
 from openai.types.chat import ChatCompletionMessage
 from openai.types.chat.chat_completion_message_tool_call import ChatCompletionMessageToolCall, Function
 
@@ -16,6 +17,9 @@ class Agent(BaseModel):
     functions: List[AgentFunction] = []
     tool_choice: str = None
     parallel_tool_calls: bool = True
+    client: OpenAI
+
+    model_config = {"arbitrary_types_allowed": True}
 
 
 class Response(BaseModel):

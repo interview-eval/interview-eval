@@ -2,11 +2,12 @@ import logging
 from typing import Any, Dict, Optional
 
 import yaml
+from openai import OpenAI
 from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
-from swarm import Agent, Result, Swarm
+from interview_eval.swarm import Agent, Result, Swarm
 
 
 class Interviewer(Agent):
@@ -17,6 +18,8 @@ class Interviewer(Agent):
     ):
         interviewer_config = config["interviewer"]
         name = name or interviewer_config["name"]
+        client_kwargs = interviewer_config.get("client", None)
+        client = OpenAI(**client_kwargs) if client_kwargs else OpenAI()
 
         instructions = (
             interviewer_config["instructions"]
@@ -24,10 +27,22 @@ class Interviewer(Agent):
             + f"\nStrategy:\n{yaml.dump(interviewer_config['strategy'], default_flow_style=False)}"
         )
 
-        super().__init__(name=name, instructions=instructions, functions=[self.conclude_interview])
+        super().__init__(name=name, instructions=instructions, functions=[self.conclude_interview], client=client)
 
     def conclude_interview(self, score: int, comments: str) -> Result:
-        """Conclude the interview with final score and comments."""
+        """End interview with final assessment.
+
+        Called when max questions reached, understanding established, or unable to progress further.
+        Also called when forced to conclude interview.
+
+        Args:
+            score (int): Final score (0-10) based on rubric
+            comments (str): Overall evaluation including strengths,
+                weaknesses, and areas for improvement
+
+        Returns:
+            Result: Final assessment with score and detailed feedback
+        """
         return Result(
             value=f"Interview concluded. Score: {score}/10\nComments: {comments}",
             context_variables={
@@ -37,17 +52,20 @@ class Interviewer(Agent):
             },
         )
 
-
 class Interviewee(Agent):
     def __init__(
         self,
         config: dict,
         name: Optional[str] = None,
     ):
+
         interviewee_config = config["interviewee"]
         name = name or interviewee_config["name"]
+        client_kwargs = interviewee_config.get("client", None)
+        client = OpenAI(**client_kwargs) if client_kwargs else OpenAI()
+
         instructions = interviewee_config["instructions"]
-        super().__init__(name=name, instructions=instructions)
+        super().__init__(name=name, instructions=instructions, client=client)
 
 
 class InterviewRunner:
@@ -67,6 +85,7 @@ class InterviewRunner:
         self.console = console
         self.questions_count = 0
         self.max_questions = config["session"].get("max_questions", 10)  # Default to 10 questions if not specified
+        self.max_retries = config["session"].get("max_retries", 2) # Default to 2 retries if not specified
 
     def display_message(self, agent_name: str, content: str):
         """Display a message with proper formatting."""
@@ -99,24 +118,9 @@ class InterviewRunner:
         )
         self.console.print("\n")
         self.console.print(results_panel)
-
-    def run(self) -> Dict[str, Any]:
-        """Run the interview and return results."""
-        # Show starting message
-        self.console.print("\n[info]Starting Interview Session...[/info]\n")
-
-        messages = [
-            {
-                "role": "user",
-                "content": self.config["session"]["initial_message"],
-            }
-        ]
-        context = self.config["session"]["initial_context"]
-
-        # Display initial message
-        self.display_message(self.interviewer.name, messages[-1]["content"])
-
-        # Start with interviewee
+    
+    def _get_response(self, agent: Agent, messages: list, context: dict) -> Result:
+        """Helper method to get response with progress spinner."""
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
@@ -124,46 +128,69 @@ class InterviewRunner:
             transient=True,
         ) as progress:
             task = progress.add_task("Processing response...", total=None)
-            response = self.client.run(agent=self.interviewee, messages=messages, context_variables=context)
+            return self.client.run(agent=agent, messages=messages, context_variables=context)
 
+    # TODO: Refactor this method to make it more readable
+    def run(self) -> Dict[str, Any]:
+        """Run the interview and return results."""
+        self.console.print("\n[info]Starting Interview Session...[/info]\n")
+
+        initial_message = self.config["session"]["initial_message"]
+        interviewer_messages = [{"role": "assistant", "content": initial_message}]
+        interviewee_messages = [{"role": "user", "content": initial_message}]
+        context = self.config["session"]["initial_context"]
+
+        self.display_message(self.interviewer.name, initial_message)
+
+        response = self._get_response(self.interviewee, interviewee_messages, context)
         self.display_message(response.agent.name, response.messages[-1]["content"])
 
         while not response.context_variables.get("interview_complete", False):
-            # Check if max questions limit has been reached
-            messages = response.messages + [{"role": "user", "content": response.messages[-1]["content"]}]
             next_agent = self.interviewer if response.agent == self.interviewee else self.interviewee
-
+            previous_response_content = response.messages[-1]["content"]
+            
             if next_agent == self.interviewer:
+                # Next speaker is interviewer
                 self.questions_count += 1
                 self.console.print(f"\n[info]Question {self.questions_count}[/info]")
-
-            with Progress(
-                SpinnerColumn(),
-                TextColumn("[progress.description]{task.description}"),
-                console=self.console,
-                transient=True,
-            ) as progress:
-                task = progress.add_task("Processing response...", total=None)
-                response = self.client.run(
-                    agent=next_agent,
-                    messages=messages,
-                    context_variables=response.context_variables,
-                )
+                interviewer_messages.extend([
+                    {"role": "user", "content": previous_response_content},
+                ])
+                interviewee_messages.extend([
+                    {"role": "assistant", "content": previous_response_content},
+                ])
+                response = self._get_response(next_agent, interviewer_messages, response.context_variables)
+            else:
+                # Next speaker is interviewee
+                interviewer_messages.extend([
+                    {"role": "assistant", "content":previous_response_content},
+                ])
+                interviewee_messages.extend([
+                    {"role": "user", "content": previous_response_content},
+                ])
+                response = self._get_response(next_agent, interviewee_messages, response.context_variables)
 
             self.display_message(response.agent.name, response.messages[-1]["content"])
 
-            if response.agent == self.interviewee and self.questions_count >= self.max_questions:
-                # Force conclude the interview
+            # 1. Check end conditions for the interview
+            if response.agent == self.interviewee and self.questions_count >= self.max_questions:                
                 final_message = "Maximum number of questions reached. Concluding interview."
                 self.console.print(f"\n[warning]{final_message}[/warning]")
-                response = self.client.run(
-                    agent=self.interviewer,
-                    messages=messages + [{"role": "system", "content": response.messages[-1]["content"]}],
-                    context_variables={"force_conclude": True},
+                
+                interviewer_messages.extend([
+                    {"role": "assistant", "content": response.messages[-1]["content"]},
+                    {"role": "user", "content": final_message},
+                ])
+                
+                response = self._get_response(
+                    self.interviewer,
+                    interviewer_messages,
+                    {"force_conclude": True}
                 )
                 self.display_message(response.agent.name, response.messages[-1]["content"])
                 break
-
+                
+        
         results = {
             "score": response.context_variables["score"],
             "feedback": response.context_variables["comments"],

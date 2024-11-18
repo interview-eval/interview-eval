@@ -2,10 +2,8 @@ import click
 from dotenv import load_dotenv
 from rich.panel import Panel
 
-from interview import Interviewee, Interviewer, InterviewRunner
-from utils import console, load_config, setup_logging
-
-load_dotenv()
+from interview_eval import Interviewee, Interviewer, InterviewRunner
+from interview_eval.utils import console, load_config, setup_logging
 
 
 @click.command()
@@ -37,12 +35,8 @@ def main(config: str, verbose: bool):
         config_data = load_config(config)
         logger = setup_logging(config_data, verbose)
 
-        interviewer = Interviewer(config=config_data, name="User")
-
-        # seed_question_pool: k questions, k reference answers
-        # interviewer.seed_questions = [{"question": "What is your name?", "answer": "System"}] * 10
-
-        student = Interviewee(config=config_data, name="System")
+        interviewer = Interviewer(config=config_data, name="Teacher")
+        student = Interviewee(config=config_data, name="Student")
 
         interview = InterviewRunner(interviewer, student, config_data, logger, console)
         interview.run()

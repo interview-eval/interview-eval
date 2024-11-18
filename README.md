@@ -4,7 +4,7 @@ Interview Process implemented in Swarm. Will be integrated with interview-eval i
 
 ### Requirements
 
-- Modifying problem
+- Modifying problem ✔️
   - Python function to modify the problem `modify_problem`
   - Supported strategies: `Unclarifying`, `Paraphrasing`, and `Modifying` (given seed question, create a new question)
 

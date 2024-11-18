@@ -3,6 +3,9 @@
 # Interviewer Configuration
 interviewer:
   name: "Math Interviewer"
+  model: "gpt-4o"
+  client:
+    api_key: ${OPENAI_API_KEY}
   instructions: |
     You are a math interviewer assessing student knowledge at the intermediate level.
     
@@ -18,7 +21,6 @@ interviewer:
   # Questioning Strategy
   strategy:
     max_questions: 10
-    warmup_questions: 2
     policy:
       - "Start with basic concept questions to assess foundational knowledge"
       - "If student answers correctly, increase difficulty gradually"
@@ -44,6 +46,10 @@ interviewer:
 # Interviewee Configuration
 interviewee:
   name: "Student"
+  model: "openai/gpt-4o-mini-2024-07-18"
+  client:
+    base_url: "https://openrouter.ai/api/v1"
+    api_key: ${OPENROUTER_API_KEY}
   instructions: |
     You are a math student at the high school level.
     
