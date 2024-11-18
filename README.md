@@ -1,8 +1,8 @@
 # interview-swarm
+
 Interview Process implemented in Swarm. Will be integrated with interview-eval in the future.
 
-
-### Requirements
+### Requirements & TODOs
 
 - Modifying problem ✔️
   - Python function to modify the problem `modify_problem`
@@ -18,6 +18,10 @@ Interview Process implemented in Swarm. Will be integrated with interview-eval i
 - Report Card
   - Per seed questions pool
   - Include information about the student's performance on each question that received different scores
+
+
+- [ ] More strict loading of config.yaml (e.g. check if all required fields are present)
+- [ ] Add documentation for the code
 
 ### Managing submodules
 
