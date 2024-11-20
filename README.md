@@ -68,7 +68,7 @@ session:
   initial_context: {}
 ```
 
-## 🎯 Advanced Interviewing
+## 🎯 Advanced Interview
 
 ### Custom Interview Flows
 
