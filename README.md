@@ -68,12 +68,21 @@ session:
   initial_context: {}
 ```
 
-## 📊 Results
+## 🎯 Advanced Interviewing
 
-The interview runner returns a dictionary containing:
-- Final score (0-10)
-- Detailed feedback and comments
-- Number of questions asked
+`interview-eval` lets you define custom interview flows as directed graphs, where each node represents an interview state (like asking questions or evaluating responses) and edges represent possible transitions between states. With this feature, you can create complex interview scenarios with branching logic, follow-up questions, and adaptive feedback based on the interviewee's responses.
+
+Below is an example flow of interview, where the Interviewer evaluates the Interviewee's response and chooses to do one of the following actions: 
+- Ask a follow-up question (Deep Dive)
+- Move on to the next topic (Next Topic)
+- Ask for clarification (Challenge)
+- End the interview (Conclude)
+
+![Interview Flow](assets/interview-flow.png)
+
+
+If you want to know more about the advanced features of the interview-swarm, please refer to the [Advanced Interviewing](docs/advanced.md) guide. 
+
 
 
 ### Requirements & TODOs
