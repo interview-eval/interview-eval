@@ -70,6 +70,10 @@ session:
 
 ## 🎯 Advanced Interviewing
 
+### Custom Interview Flows
+
+***Note: This feature is still under development and will be available in future releases.***
+
 `interview-eval` lets you define custom interview flows as directed graphs, where each node represents an interview state (like asking questions or evaluating responses) and edges represent possible transitions between states. With this feature, you can create complex interview scenarios with branching logic, follow-up questions, and adaptive feedback based on the interviewee's responses.
 
 Below is an example flow of interview, where the Interviewer evaluates the Interviewee's response and chooses to do one of the following actions: 
@@ -81,8 +85,53 @@ Below is an example flow of interview, where the Interviewer evaluates the Inter
 ![Interview Flow](assets/interview-flow.png)
 
 
-If you want to know more about the advanced features of the interview-swarm, please refer to the [Advanced Interviewing](docs/advanced.md) guide. 
+### Question Decontamination
 
+For users conducting benchmark-based interview (like GSM8K, MMLU, etc.), `interview-eval` provides functions to prevent test set contamination through three transformation strategies:
+
+```python
+from interview_eval import decontaminate_question
+
+# Choose from three decontamination methods
+question = decontaminate_question(
+    question="What is 15% of 200?",
+    reference_answer="30",
+    method="modifying"  # or "unclarifying" or "paraphrasing"
+)
+```
+
+1. **Unclarifying** (`method="unclarifying"`)
+   - Removes key information while maintaining grammar
+   - Forces interviewee to ask clarifying questions
+   - Evaluates information-gathering skills
+
+2. **Paraphrasing** (`method="paraphrasing"`)
+   - Preserves exact meaning with different wording
+   - Changes sentence structure
+   - Maintains problem complexity
+
+3. **Modifying** (`method="modifying"`)
+   - Creates new but related questions
+   - Keeps similar domain and difficulty
+   - Tests same knowledge areas
+
+
+Batch processing of questions is also supported:
+
+```python
+from interview_eval import batch_decontaminate
+
+questions = [
+    {"question": "Q1...", "reference_answer": "A1..."},
+    {"question": "Q2...", "reference_answer": "A2..."}
+]
+
+decontaminated = batch_decontaminate(
+    questions,
+    method="modifying",
+    model="gpt-4"
+)
+```
 
 
 ### Requirements & TODOs
