@@ -21,17 +21,15 @@ pip install interview-eval
 
 ```python
 from interview_eval import InterviewRunner, Interviewer, Interviewee
-from rich.console import Console
+from interview_eval.utils import console, load_config, setup_logging
 import logging
 import yaml
 
 # Load configuration
-with open("config.yaml", "r") as f:
-    config = yaml.safe_load(f)
+config = load_config("config.yaml")
 
 # Setup logging and console
-logger = logging.getLogger("interview_eval")
-console = Console()
+setup_logging("interview.log", verbose=True)
 
 # Initialize agents
 interviewer = Interviewer(config)
@@ -153,7 +151,7 @@ decontaminated = batch_decontaminate(
 
 
 - [ ] More strict loading of config.yaml (e.g. check if all required fields are present)
-- [ ] Add documentation for the code
+- [X] Add documentation for the code
 - [ ] Support interview_type: "base", "adaptive"
 - [ ] Fix the organization for cli support
 - [ ] Add tests
