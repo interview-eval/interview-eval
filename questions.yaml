@@ -1,0 +1,44 @@
+# questions.yaml
+data_structures:
+  - text: "Can you explain how a hash table works and when you would use one?"
+    topic: "data_structures"
+    difficulty: 0.5
+    expected_concepts: ["hashing", "collision_resolution", "time_complexity"]
+    follow_ups: 
+      - "How do you handle collisions?"
+      - "What's the difference between separate chaining and open addressing?"
+
+  - text: "Explain the trade-offs between using an array vs a linked list."
+    topic: "data_structures"
+    difficulty: 0.6
+    expected_concepts: ["memory_allocation", "access_patterns", "insertion_deletion"]
+    follow_ups:
+      - "When would you choose one over the other?"
+      - "How does memory locality affect performance?"
+
+algorithms:
+  - text: "What is the difference between DFS and BFS? When would you use each?"
+    topic: "algorithms"
+    difficulty: 0.7
+    expected_concepts: ["graph_traversal", "space_complexity", "use_cases"]
+    follow_ups:
+      - "How would you implement DFS iteratively?"
+      - "What are the space implications of each approach?"
+
+system_design:
+  - text: "How would you design a URL shortening service?"
+    topic: "system_design"
+    difficulty: 0.8
+    expected_concepts: ["scalability", "data_storage", "api_design"]
+    follow_ups:
+      - "How would you handle collisions in short URLs?"
+      - "How would you scale this to handle millions of requests?"
+
+programming_concepts:
+  - text: "Explain the concept of dependency injection and its benefits."
+    topic: "programming_concepts"
+    difficulty: 0.7
+    expected_concepts: ["loose_coupling", "testability", "inversion_of_control"]
+    follow_ups:
+      - "How does DI improve testability?"
+      - "What are the different types of DI?"

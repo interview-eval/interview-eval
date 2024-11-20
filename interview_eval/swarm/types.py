@@ -19,7 +19,10 @@ class Agent(BaseModel):
     parallel_tool_calls: bool = True
     client: OpenAI
 
-    model_config = {"arbitrary_types_allowed": True}
+    # Allow arbitrary attributes
+    class Config:
+        arbitrary_types_allowed = True  # Needed for OpenAI client
+        extra = "allow"  # Allows additional attributes to be set
 
 
 class Response(BaseModel):

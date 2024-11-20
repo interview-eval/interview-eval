@@ -6,7 +6,7 @@
     
 #     EvaluateResponse --> DeepDive: Technical detail needed
 #     EvaluateResponse --> Challenge: Clarification needed
-#     EvaluateResponse --> NextTopic: Satisfactory answer
+#     EvaluateResponse --> NextQuestion: Satisfactory answer
 #     EvaluateResponse --> Conclude: Understanding complete
 
 #     DeepDive --> Question

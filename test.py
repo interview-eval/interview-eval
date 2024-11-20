@@ -1,34 +1,86 @@
 from dotenv import load_dotenv
 from rich.panel import Panel
-from interview_eval.custom_interview_experimental import StateMachineInterviewer, Interviewee, StateMachineRunner
+from interview_eval.custom_interview_experimental import AdaptiveInterviewer, AdaptiveInterviewRunner, Question
 from interview_eval.utils import console, load_config, setup_logging
+from interview_eval import Interviewee
+from openai import OpenAI
+import yaml
+from typing import Dict, List
+
+
+def load_question_bank(path: str) -> Dict[str, List[Question]]:
+    """Load question bank from YAML file."""
+    with open(path, "r") as f:
+        raw_data = yaml.safe_load(f)
+
+    question_bank = {}
+    for topic, questions in raw_data.items():
+        question_bank[topic] = [Question(**q) for q in questions]
+
+    return question_bank
 
 
 def main():
+    """Main entry point for the Adaptive Interview System."""
     console.print(
         Panel(
-            "[green]Automated Interview System[/green]\n[cyan]Use Ctrl+C to exit[/cyan]",
+            "[green]Adaptive Interview System[/green]\n"
+            "[cyan]Use Ctrl+C to exit[/cyan]",
             border_style="green",
             padding=(1, 2),
         )
     )
 
     try:
+        # Load environment variables
         load_dotenv()
+
+        # Load configurations
         config_data = load_config("config.yaml")
+        
         logger = setup_logging(config_data, verbose=True)
 
-        interviewer = StateMachineInterviewer(config=config_data, name="Teacher")
-        student = Interviewee(config=config_data, name="Student")
-        interview = StateMachineRunner(
-            interviewer, student, config_data, logger, console
+        # Load question bank
+        question_bank = load_question_bank("questions.yaml")
+
+        # Initialize agents
+        interviewer = AdaptiveInterviewer(
+            config=config_data, question_bank=question_bank, name="Interviewer"
         )
-        interview.run()
+
+        interviewee = Interviewee(
+            config=config_data, name="Student"
+        )
+
+        # Initialize and run interview
+        interview = AdaptiveInterviewRunner(
+            config=config_data,
+            interviewer=interviewer,
+            interviewee=interviewee,
+            logger=logger,
+            console=console,
+        )
+
+        results = interview.run()
+
+        # Display final results
+        console.print(
+            Panel(
+                f"[green]Interview Complete![/green]\n"
+                f"Final Score: {results['final_score']:.1f}/10\n"
+                f"Topics Covered: {len(results['topics_covered'])}\n"
+                f"Total Questions: {len(results['response_history'])}",
+                border_style="green",
+                padding=(1, 2),
+            )
+        )
 
     except KeyboardInterrupt:
-        console.print("\n[warning]Interview session interrupted[/warning]")
+        console.print("\n[yellow]Interview session interrupted by user[/yellow]")
+
     except Exception as e:
-        console.print(f"\n[error]Error: {str(e)}[/error]")
+        console.print(f"\n[red]Error: {str(e)}[/red]")
+        logger.exception("Unexpected error during interview")
         raise
 
 
