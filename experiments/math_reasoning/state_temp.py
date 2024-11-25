@@ -3,13 +3,12 @@ from enum import Enum, auto
 from typing import Any, Callable, Dict, Tuple
 
 from src.utils import extract_json
-from .prompt import (
-    EVALUATEE_STATE_EXP_PROMPT_TEMPLATE,
-    EVALUATOR_STATE_EXP_PROMPT_TEMPLATE,
-    EVALUATOR_STATE_UNC_PROMPT_TEMPLATE,
-    MODERATOR_STATE_INIT_PARAPHRASING_PROMPT_TEMPLATE,
-    MODERATOR_STATE_INIT_UNCLARIFYING_PROMPT_TEMPLATE,
-)
+
+from .prompt import (EVALUATEE_STATE_EXP_PROMPT_TEMPLATE,
+                     EVALUATOR_STATE_EXP_PROMPT_TEMPLATE,
+                     EVALUATOR_STATE_UNC_PROMPT_TEMPLATE,
+                     MODERATOR_STATE_INIT_PARAPHRASING_PROMPT_TEMPLATE,
+                     MODERATOR_STATE_INIT_UNCLARIFYING_PROMPT_TEMPLATE)
 
 
 class InterviewState(Enum):

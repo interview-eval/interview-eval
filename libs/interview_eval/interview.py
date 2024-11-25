@@ -2,12 +2,11 @@ import logging
 from typing import Any, Dict, Optional
 
 import yaml
+from interview_eval.swarm import Agent, Result, Swarm
 from openai import OpenAI
 from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
-
-from interview_eval.swarm import Agent, Result, Swarm
 
 
 class Interviewer(Agent):
@@ -52,6 +51,7 @@ class Interviewer(Agent):
             },
         )
 
+
 class Interviewee(Agent):
     def __init__(
         self,
@@ -85,7 +85,7 @@ class InterviewRunner:
         self.console = console
         self.questions_count = 0
         self.max_questions = config["session"].get("max_questions", 10)  # Default to 10 questions if not specified
-        self.max_retries = config["session"].get("max_retries", 2) # Default to 2 retries if not specified
+        self.max_retries = config["session"].get("max_retries", 2)  # Default to 2 retries if not specified
 
     def display_message(self, agent_name: str, content: str):
         """Display a message with proper formatting."""
@@ -118,7 +118,7 @@ class InterviewRunner:
         )
         self.console.print("\n")
         self.console.print(results_panel)
-    
+
     def _get_response(self, agent: Agent, messages: list, context: dict) -> Result:
         """Helper method to get response with progress spinner."""
         with Progress(
@@ -148,49 +148,54 @@ class InterviewRunner:
         while not response.context_variables.get("interview_complete", False):
             next_agent = self.interviewer if response.agent == self.interviewee else self.interviewee
             previous_response_content = response.messages[-1]["content"]
-            
+
             if next_agent == self.interviewer:
                 # Next speaker is interviewer
                 self.questions_count += 1
                 self.console.print(f"\n[info]Question {self.questions_count}[/info]")
-                interviewer_messages.extend([
-                    {"role": "user", "content": previous_response_content},
-                ])
-                interviewee_messages.extend([
-                    {"role": "assistant", "content": previous_response_content},
-                ])
+                interviewer_messages.extend(
+                    [
+                        {"role": "user", "content": previous_response_content},
+                    ]
+                )
+                interviewee_messages.extend(
+                    [
+                        {"role": "assistant", "content": previous_response_content},
+                    ]
+                )
                 response = self._get_response(next_agent, interviewer_messages, response.context_variables)
             else:
                 # Next speaker is interviewee
-                interviewer_messages.extend([
-                    {"role": "assistant", "content":previous_response_content},
-                ])
-                interviewee_messages.extend([
-                    {"role": "user", "content": previous_response_content},
-                ])
+                interviewer_messages.extend(
+                    [
+                        {"role": "assistant", "content": previous_response_content},
+                    ]
+                )
+                interviewee_messages.extend(
+                    [
+                        {"role": "user", "content": previous_response_content},
+                    ]
+                )
                 response = self._get_response(next_agent, interviewee_messages, response.context_variables)
 
             self.display_message(response.agent.name, response.messages[-1]["content"])
 
             # 1. Check end conditions for the interview
-            if response.agent == self.interviewee and self.questions_count >= self.max_questions:                
+            if response.agent == self.interviewee and self.questions_count >= self.max_questions:
                 final_message = "Maximum number of questions reached. Concluding interview."
                 self.console.print(f"\n[warning]{final_message}[/warning]")
-                
-                interviewer_messages.extend([
-                    {"role": "assistant", "content": response.messages[-1]["content"]},
-                    {"role": "user", "content": final_message},
-                ])
-                
-                response = self._get_response(
-                    self.interviewer,
-                    interviewer_messages,
-                    {"force_conclude": True}
+
+                interviewer_messages.extend(
+                    [
+                        {"role": "assistant", "content": response.messages[-1]["content"]},
+                        {"role": "user", "content": final_message},
+                    ]
                 )
+
+                response = self._get_response(self.interviewer, interviewer_messages, {"force_conclude": True})
                 self.display_message(response.agent.name, response.messages[-1]["content"])
                 break
-                
-        
+
         results = {
             "score": response.context_variables["score"],
             "feedback": response.context_variables["comments"],

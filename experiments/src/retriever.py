@@ -4,17 +4,17 @@ from typing import Dict, List, Union
 import pandas as pd
 from datasets import load_dataset
 from langchain_chroma import Chroma
-from langchain_community.retrievers import BM25Retriever
 from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.retrievers import BM25Retriever
 
 
 class Retriever:
     def __init__(self, task_name: str) -> None:
-        if task_name not in ["depth_qa","math"]:
+        if task_name not in ["depth_qa", "math"]:
             raise ValueError("Currently only task name 'depth_qa' and math are supported.")
-        self.task_name = task_name  
-        if task_name == 'depth_qa':
-            
+        self.task_name = task_name
+        if task_name == "depth_qa":
+
             self.data_path = f"./data/{task_name}_keyword.csv"
 
             self.df = pd.read_csv(self.data_path)
@@ -23,10 +23,13 @@ class Retriever:
             self.retriever = self.get_chroma_db(texts=self.df["content"].tolist(), embedding=self.embedding)
         elif task_name == "math":
             ds = load_dataset("lighteval/MATH", "geometry")
-            import pdb;pdb.set_trace()
-            self.df = pd.DataFrame(ds['test'])
+            import pdb
+
+            pdb.set_trace()
+            self.df = pd.DataFrame(ds["test"])
             self.embedding = self.get_embedding_model(model_name="thenlper/gte-base")
             self.retriever = self.get_chroma_db(texts=self.df["solution"].tolist(), embedding=self.embedding)
+
     @staticmethod
     def get_embedding_model(model_name: str, cache_folder: str = None) -> HuggingFaceEmbeddings:
         """Initialize the Huggingface Embedding model."""

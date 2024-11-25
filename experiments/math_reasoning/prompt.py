@@ -1,7 +1,7 @@
 # prompt.py
 from src.utils import extract_json
 
-MATH_MODERATOR_STATE_INIT_UNCLARIFYING_PROMPT_TEMPLATE = '''You are given a mathematical expression where key information must be removed, but the remaining structure and operations should not change. Only remove critical data that makes the problem unsolvable without that information.
+MATH_MODERATOR_STATE_INIT_UNCLARIFYING_PROMPT_TEMPLATE = """You are given a mathematical expression where key information must be removed, but the remaining structure and operations should not change. Only remove critical data that makes the problem unsolvable without that information.
 
 Guidelines:
 1. Remove only key information required for the solution (e.g., constants, values) without changing the operations and convert to unknown variables or ambiguous words.
@@ -29,7 +29,7 @@ output: {{
 }}
 
 
-Initial question(Remove the information and do not change other information or operations): {question}'''
+Initial question(Remove the information and do not change other information or operations): {question}"""
 # """
 # Task : Remove some critical information from the "initial_question" and set the modified question as "revised_question." The revised question should not be solvable without the deleted information.
 # The equation is in latex format.
@@ -64,7 +64,6 @@ Initial question(Remove the information and do not change other information or o
 
 # Output:
 # """
-
 
 
 MATH_MODERATOR_STATE_INIT_PARAPHRASING_PROMPT_TEMPLATE = """
@@ -140,7 +139,6 @@ Explain **exactly how and where it fits into the equation or text**.
 Expert feedback:"""
 
 
-
 MATH_EVALUATOR_STATE_EXP_0_PROMPT_TEMPLATE = """
 Task: Refer the pre-generated evaluation on given question below, and generate the feedback for the model. 
 ---
@@ -182,7 +180,6 @@ Correct answer (DO NOT disclose): {answer}
 Pre-generated Evaluation: {evaluation}
 Previous Feedback: {model_history}
 Model output (to evaluate): {model_output}"""
-
 
 
 MATH_EVALUATOR_STATE_EXP_1_PROMPT_TEMPLATE = """
@@ -285,7 +282,7 @@ Dialouge History : {Dialogue_History}
 Evluatee Model's Output (This is the only part to be evaluated): {response}
 Evalautor : """
 
-MATH_EVALUATOR_STATE_INDEPTH_SUCCESS_1_QUESTION_PROMPT_TEMPLATE = '''You are an evaluator assessing the Evaluatee model. The Evaluatee has successfully answered the problem, and the following is the Evaluatee's solution. Your role is to determine whether the Evaluatee truly understands their solution or if they arrived at the answer through memorization without proper understanding. To do this, you should ask questions that can assess the model's understanding of its own solution. 
+MATH_EVALUATOR_STATE_INDEPTH_SUCCESS_1_QUESTION_PROMPT_TEMPLATE = """You are an evaluator assessing the Evaluatee model. The Evaluatee has successfully answered the problem, and the following is the Evaluatee's solution. Your role is to determine whether the Evaluatee truly understands their solution or if they arrived at the answer through memorization without proper understanding. To do this, you should ask questions that can assess the model's understanding of its own solution. 
 
 Guidelines:
 If there are errors or missing steps in Evaluatee's solution, ask questions to clarify or correct these issues.
@@ -309,7 +306,7 @@ previous history: {Dialogue_History}
 
 Now provide your feedback in JSON format 
 Ensure your question does not repeat previous history. Try to ask about different solving steps with previous history. :
-Evaluator:'''
+Evaluator:"""
 MATH_EVALUATOR_STATE_INDEPTH_SUCCESS_0_QUESTION_PROMPT_TEMPLATE = """You are an evaluator assessing the Evaluatee model. The Evaluatee has successfully answered the problem. The initial question, reference solution and model's solution are given below. 
 To determine whether the Evaluatee truly understands their solution or if they arrived at the answer through memorization without proper understanding, Evaluatee was asked of the questions from its own solution, which is denoted as follow-up question below.
 Your job is to assess the model output of follow-up question. You can refer the reference solution for follow-up question below for evaluation. Don't point out things that are too trivial or subtle.
@@ -337,13 +334,13 @@ Model output on Follow-up question (This is the only part to be evaluated):
 {model_output}
 Expert feedback:"""
 
-# MATH_EVALUATEE_STATE_EXP_PROMPT_TEMPLATE = """You are a helpful assistant assigned with the task of problem-solving.  To achieve this, you can proactively ask user to give additional information. At each turn, you should provide your step-by-step thinking for solving the task. You have chances to interact with the environment or propose a solution and answer. 
+# MATH_EVALUATEE_STATE_EXP_PROMPT_TEMPLATE = """You are a helpful assistant assigned with the task of problem-solving.  To achieve this, you can proactively ask user to give additional information. At each turn, you should provide your step-by-step thinking for solving the task. You have chances to interact with the environment or propose a solution and answer.
 
 # Question: {question}"""
 
 MATH_EVALUATEE_STATE_EXP_PROMPT_TEMPLATE = """Question: {question}"""
 
-MATH_GRADER_PROMPT_TEMPLATE = '''Task: You are provided with a model’s output, a reference solution, and a correct answer. Your goal is to determine the correctness of the model's output by comparing it with the reference solution and the correct answer. Note that the reference solution is just a guide—there could be other valid methods to solve the problem.
+MATH_GRADER_PROMPT_TEMPLATE = """Task: You are provided with a model’s output, a reference solution, and a correct answer. Your goal is to determine the correctness of the model's output by comparing it with the reference solution and the correct answer. Note that the reference solution is just a guide—there could be other valid methods to solve the problem.
 
 Please return the evaluation in the following JSON format, which includes the correctness of the model’s final answer and the correctness of the solving process, explanation and it's error type.
 Possible Error Types are:
@@ -364,4 +361,4 @@ Initial question : {question}
 Correct answer : {answer}
 Reference solution : {solution}
 Model's Ouput : {history}
-'''
+"""

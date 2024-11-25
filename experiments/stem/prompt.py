@@ -73,7 +73,6 @@ Solution: {solution}
 """
 
 
-
 STEM_MODERATOR_STATE_INIT_PARAPHRASING_PROMPT_TEMPLATE = """Paraphrase the following question to make it as different as possible while retaining its meaning and all the important information. Response in JSON format.
 ---
 Here are examples. Please follow the format as the following expert acts. Your output must be in a json format.
@@ -83,7 +82,7 @@ output : {{"revised_question" : "In the context of special relativity, consider 
 initial question : {question}
 """
 
-STEM_EVALUATOR_STATE_EXP_0_PROMPT_TEMPLATE = '''
+STEM_EVALUATOR_STATE_EXP_0_PROMPT_TEMPLATE = """
 You are provided with a question, a reference solution, the model's output which is divided into atomic fact units, along with their correctiveness.
 
 Your role is to generate the feedback to the model based on the given assessment on reference solution.
@@ -110,7 +109,7 @@ Reference Solution: {solution}
 Model's Output: {history}
 
 Feedback:
-'''
+"""
 
 
 STEM_EVALUATOR_STATE_EXP_PROMPT_TEMPLATE = """You are an expert tasked with evaluating and providing feedback on an assistant's performance.
@@ -177,7 +176,7 @@ Evalautor : """
 
 STEM_EVALUATEE_STATE_EXP_PROMPT_TEMPLATE = """Question: {question}"""
 
-STEM_GRADER_0_PROMPT_TEMPLATE  = """
+STEM_GRADER_0_PROMPT_TEMPLATE = """
 You are tasked with evaluating a model's output based on the given question and reference solution.
 
 1. Break down the model's output into atomic facts (distinct units of single information).
@@ -226,7 +225,7 @@ Output format:
 ### Output:
 """
 
-STEM_GRADER_1_PROMPT_TEMPLATE = '''Task:
+STEM_GRADER_1_PROMPT_TEMPLATE = """Task:
 You are given a question, a reference solution, and the model's output, which is broken down into atomic fact units, along with their correctness and justification.
 The model has revised the incorrect parts of its original output, and these revisions are provided in the model's correction statement.
 
@@ -273,7 +272,7 @@ Previous Feedback: {feedback}
 Model's original output with correctness: {history}
 Model's correction statement: {correction}
 Output:
-'''
+"""
 
 STEM_GRADER_0_RECALL_PROMPT_TEMPLATE = """
 
@@ -371,7 +370,7 @@ Output:
 #     {{
 #       "fact_number": 1,
 #       "fact": "" // atomic fact of the reference solution
-#     }}, 
+#     }},
 #   ],
 #   "model_atomic_facts": [
 #     {{
@@ -549,7 +548,7 @@ Model's correction statement: {correction}
 Your Evaluation Output:
 
 """
-STEM_GRADER_0_PRECISION_PROMPT_TEMPLATE  = """
+STEM_GRADER_0_PRECISION_PROMPT_TEMPLATE = """
 You are tasked with evaluating a model's output based on the given question and reference solution.
 
 1. Decompose the model’s output into individual atomic facts. An atomic fact is a sentence containing a singular piece of information.
@@ -600,7 +599,7 @@ Output format:
 """
 
 
-STEM_GRADER_1_PRECISION_PROMPT_TEMPLATE  = """
+STEM_GRADER_1_PRECISION_PROMPT_TEMPLATE = """
 You are tasked with evaluating a model's output based on the given question and reference solution.
 
 Input:
@@ -662,7 +661,7 @@ Output:
 """
 
 # STEM_GRADER_1_RECALL_PROMPT_TEMPLATE  = """
-# You are given the Question, Reference solution and Model's answer on it. Compare the Reference solution with Models' answer and verify the facts that are in Reference solution but not answered by model. 
+# You are given the Question, Reference solution and Model's answer on it. Compare the Reference solution with Models' answer and verify the facts that are in Reference solution but not answered by model.
 
 # Output format:
 

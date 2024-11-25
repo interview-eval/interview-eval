@@ -56,7 +56,7 @@ class Swarm:
             "tool_choice": agent.tool_choice,
             "stream": stream,
         }
-        
+
         if tools:
             create_params["parallel_tool_calls"] = agent.parallel_tool_calls
 

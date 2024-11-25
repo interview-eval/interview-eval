@@ -3,7 +3,6 @@ from typing import List
 from dotenv import load_dotenv
 from langchain.schema import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
-
 from src.dialogue import DialogueAgent, DialogueSimulator, select_next_speaker
 from src.prompt import (
     AGENT_DESCRIPTOR_SYSTEM_MESSAGE,

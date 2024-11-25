@@ -6,16 +6,16 @@ from typing import Dict, List
 from dotenv import load_dotenv
 from langchain.schema import HumanMessage, SystemMessage
 from langchain_openai import AzureChatOpenAI, ChatOpenAI
-
-
 from math_reasoning.temp_data import MATH_GEO_LEVEL_2, MATH_GEO_LEVEL_3, MATH_GEO_LEVEL_4, MATH_GEO_LEVEL_5
 from src.base_agent import DialogueAgent, EvaluateAgent
+from src.base_state import InterviewState, InterviewType
 from src.dialogue import DialogueSimulator, Moderator, select_next_speaker
 from src.models import ChatModel
 from src.prompt import AGENT_DESCRIPTOR_SYSTEM_MESSAGE, AGENT_SPECIFIER_PROMPT_TEMPLATE, SYSTEM_MESSAGE_TEMPLATE
-from src.base_state import InterviewType,InterviewState
 from src.utils import load_jsonl_file
+
 load_dotenv()
+
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
@@ -31,8 +31,12 @@ def parse_arguments():
 
 
 def generate_agent_description(name: str, conversation_description: str, word_limit: int) -> str:
-    
-    role_description = "an Evaluator that assess the System's ability" if name in ["Evaluator", "User"] else "an AI assistant solving a problem"
+
+    role_description = (
+        "an Evaluator that assess the System's ability"
+        if name in ["Evaluator", "User"]
+        else "an AI assistant solving a problem"
+    )
     agent_specifier_prompt = [
         SystemMessage(content=AGENT_DESCRIPTOR_SYSTEM_MESSAGE),
         HumanMessage(
@@ -46,6 +50,7 @@ def generate_agent_description(name: str, conversation_description: str, word_li
     ]
     # import pdb;pdb.set_trace()
     return ChatOpenAI(temperature=1.0, model="gpt-4o-2024-05-13").invoke(agent_specifier_prompt).content
+
 
 def generate_system_message(name: str, description: str, conversation_description: str) -> str:
     return SYSTEM_MESSAGE_TEMPLATE.format(
@@ -74,7 +79,7 @@ def create_agents(
 def main():
     args = parse_arguments()
     load_dotenv()
-    
+
     # Interview Settings
     topic = "Math problem solving"
     seed_questions = load_jsonl_file("./data/math_samples.jsonl")
@@ -93,7 +98,7 @@ def main():
         agents_name=names,
         start_query_index=args.start_query_index,
         state_threshold=args.state_threshold,
-        init_action = args.init_action
+        init_action=args.init_action,
     )
     # Agents Setting
     agent_descriptions = {
@@ -112,13 +117,19 @@ def main():
     agents = create_agents(names, agent_system_messages, agents_model)
 
     # Simulation
-    simulator = DialogueSimulator(agents=agents, moderator=moderator, selection_function=select_next_speaker,task_type = InterviewType.MATH , output_path = args.output_path)
+    simulator = DialogueSimulator(
+        agents=agents,
+        moderator=moderator,
+        selection_function=select_next_speaker,
+        task_type=InterviewType.MATH,
+        output_path=args.output_path,
+    )
     simulator.reset()
 
     while simulator.moderator.state != InterviewState.EVALUATION_COMPLETE:
         simulator.step()
 
-    #simulator.moderator.save_attributes_to_file(file_path=args.output_path)
+    # simulator.moderator.save_attributes_to_file(file_path=args.output_path)
 
 
 if __name__ == "__main__":

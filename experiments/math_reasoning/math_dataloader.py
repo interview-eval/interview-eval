@@ -2,30 +2,28 @@ import json
 from collections import defaultdict
 from typing import Dict, List, Set
 
-from datasets import load_dataset
 import pandas as pd
+from datasets import load_dataset
+
 
 class HFMATHLoader:
-    def __init__(self, hf_repo: str = "lighteval/MATH", split: str = "test", category : str = "algebra"):
+    def __init__(self, hf_repo: str = "lighteval/MATH", split: str = "test", category: str = "algebra"):
         self.hf_repo = hf_repo
         self.split = split
         self.category = category
-        
-        
 
     def load_data(self, except_questions: bool = False, remove_unused_columns: bool = True):
         print(f"Loading data from {self.hf_repo}...")
-        self.ds = pd.DataFrame(load_dataset(self.hf_repo,self.category)[self.split])
+        self.ds = pd.DataFrame(load_dataset(self.hf_repo, self.category)[self.split])
         self.ds = self.ds.rename(columns={"problem": "initial_question"})
         return self.ds
 
-
     def load_samples(self, N):
         # Ensure the 'level' column has no leading/trailing whitespace
-        self.ds['level'] = self.ds['level'].str.strip()
+        self.ds["level"] = self.ds["level"].str.strip()
 
         # Group by 'level' column
-        grouped = self.ds.groupby('level')
+        grouped = self.ds.groupby("level")
 
         # Calculate how many samples to take from each group
         samples_per_group = N // len(grouped)
@@ -58,21 +56,19 @@ class HFMATHLoader:
                 selected_samples = pd.concat([selected_samples, remaining_samples])
 
         # Sort the selected samples by 'level'
-        selected_samples = selected_samples.sort_values(by='level')
+        selected_samples = selected_samples.sort_values(by="level")
 
         return selected_samples
 
 
-
-
 if __name__ == "__main__":
-    loader_test_algebra = HFMATHLoader(split= "test", category = "algebra")
-    loader_test_intermediate_algebra = HFMATHLoader(split= "test", category = "intermediate_algebra")
-    loader_test_prealgebra = HFMATHLoader(split= "test", category = "prealgebra")
+    loader_test_algebra = HFMATHLoader(split="test", category="algebra")
+    loader_test_intermediate_algebra = HFMATHLoader(split="test", category="intermediate_algebra")
+    loader_test_prealgebra = HFMATHLoader(split="test", category="prealgebra")
 
-    loader_train_algebra = HFMATHLoader(split ="train", category = "algebra")
-    loader_train_intermediate_algebra = HFMATHLoader(split ="train", category = "intermediate_algebra")
-    loader_train_prealgebra = HFMATHLoader(split= "train", category = "prealgebra")
+    loader_train_algebra = HFMATHLoader(split="train", category="algebra")
+    loader_train_intermediate_algebra = HFMATHLoader(split="train", category="intermediate_algebra")
+    loader_train_prealgebra = HFMATHLoader(split="train", category="prealgebra")
 
     loader_test_algebra.load_data()
     loader_test_intermediate_algebra.load_data()
@@ -81,23 +77,21 @@ if __name__ == "__main__":
     loader_train_intermediate_algebra.load_data()
     loader_train_prealgebra.load_data()
 
-
     samples_1 = pd.DataFrame(loader_test_algebra.load_samples(1000))
     samples_2 = pd.DataFrame(loader_test_intermediate_algebra.load_samples(900))
     samples_2_1 = pd.DataFrame(loader_test_prealgebra.load_samples(100))
-    
+
     samples_3 = pd.DataFrame(loader_train_algebra.load_samples(1000))
     samples_4 = pd.DataFrame(loader_train_intermediate_algebra.load_samples(900))
     samples_4_1 = pd.DataFrame(loader_train_prealgebra.load_samples(100))
 
+    samples_1 = samples_1.to_dict(orient="records")
+    samples_2 = samples_2.to_dict(orient="records")
+    samples_2_1 = samples_2_1.to_dict(orient="records")
 
-    samples_1 = samples_1.to_dict(orient='records')
-    samples_2 = samples_2.to_dict(orient='records')
-    samples_2_1 = samples_2_1.to_dict(orient='records')
-
-    samples_3 = samples_3.to_dict(orient='records')
-    samples_4 = samples_4.to_dict(orient='records')
-    samples_4_1 = samples_4_1.to_dict(orient='records')
+    samples_3 = samples_3.to_dict(orient="records")
+    samples_4 = samples_4.to_dict(orient="records")
+    samples_4_1 = samples_4_1.to_dict(orient="records")
 
     # Export the samples as jsonl
     samples_jsonl = "data/math_algebra_test.jsonl"
@@ -109,7 +103,7 @@ if __name__ == "__main__":
     samples_jsonl = "data/math_algebra_pre_test.jsonl"
     with open(samples_jsonl, "w") as f:
         f.write(json.dumps(samples_2_1))
-    
+
     samples_jsonl = "data/math_algebra_train.jsonl"
     with open(samples_jsonl, "w") as f:
         f.write(json.dumps(samples_3))
@@ -117,9 +111,7 @@ if __name__ == "__main__":
     samples_jsonl = "data/math_algebra_inter_train.jsonl"
     with open(samples_jsonl, "w") as f:
         f.write(json.dumps(samples_4))
-    
+
     samples_jsonl = "data/math_algebra_pre_train.jsonl"
     with open(samples_jsonl, "w") as f:
         f.write(json.dumps(samples_4_1))
-
-    

@@ -1,11 +1,12 @@
+from typing import Dict, List
+
+import yaml
 from dotenv import load_dotenv
-from rich.panel import Panel
+from interview_eval import Interviewee
 from interview_eval.custom_interview_experimental import AdaptiveInterviewer, AdaptiveInterviewRunner, Question
 from interview_eval.utils import console, load_config, setup_logging
-from interview_eval import Interviewee
 from openai import OpenAI
-import yaml
-from typing import Dict, List
+from rich.panel import Panel
 
 
 def load_question_bank(path: str) -> Dict[str, List[Question]]:
@@ -24,8 +25,7 @@ def main():
     """Main entry point for the Adaptive Interview System."""
     console.print(
         Panel(
-            "[green]Adaptive Interview System[/green]\n"
-            "[cyan]Use Ctrl+C to exit[/cyan]",
+            "[green]Adaptive Interview System[/green]\n" "[cyan]Use Ctrl+C to exit[/cyan]",
             border_style="green",
             padding=(1, 2),
         )
@@ -37,20 +37,16 @@ def main():
 
         # Load configurations
         config_data = load_config("config.yaml")
-        
+
         logger = setup_logging(config_data, verbose=True)
 
         # Load question bank
         question_bank = load_question_bank("questions.yaml")
 
         # Initialize agents
-        interviewer = AdaptiveInterviewer(
-            config=config_data, question_bank=question_bank, name="Interviewer"
-        )
+        interviewer = AdaptiveInterviewer(config=config_data, question_bank=question_bank, name="Interviewer")
 
-        interviewee = Interviewee(
-            config=config_data, name="Student"
-        )
+        interviewee = Interviewee(config=config_data, name="Student")
 
         # Initialize and run interview
         interview = AdaptiveInterviewRunner(

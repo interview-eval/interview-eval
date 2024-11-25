@@ -1,9 +1,8 @@
 import click
 from dotenv import load_dotenv
-from rich.panel import Panel
-
 from interview_eval import Interviewee, Interviewer, InterviewRunner
 from interview_eval.utils import console, load_config, setup_logging
+from rich.panel import Panel
 
 
 @click.command()

@@ -7,7 +7,6 @@ from langchain.chat_models.base import BaseChatModel
 from langchain.schema import HumanMessage, SystemMessage
 from langchain_core.language_models import BaseChatModel
 from langchain_openai import ChatOpenAI
-
 from src.prompt import SESSION_SUMMARIZE_PROMPT
 from src.utils import extract_json, select_queries
 
@@ -89,14 +88,12 @@ class BaseAgent(ABC):
 class DialogueAgent(BaseAgent):
     def reset(self) -> None:
         self.session_history: List[str] = []
-        
+
     def omit_adjacent_indices(self):
         # Ensure the indices are in order and valid
-    # Omit the two adjacent indices
-        idx = len(self.session_history) //2
-        self.session_history[idx:idx+2] = ["omitted for brevity."]
-        
-
+        # Omit the two adjacent indices
+        idx = len(self.session_history) // 2
+        self.session_history[idx : idx + 2] = ["omitted for brevity."]
 
     def send(self) -> str:
         try:
@@ -119,14 +116,14 @@ class DialogueAgent(BaseAgent):
                 message_content = message.content
             except:
                 message_content = message
-            
+
             self.session_history.append(f"{self.name}: {message_content}")
             print(f"\n{self.name}: {message_content}")
             return message_content
         except:
             message_content = ""
             while message_content:
-                
+
                 self.omit_adjacent_indices()
                 if self.system_message:
 
@@ -141,9 +138,8 @@ class DialogueAgent(BaseAgent):
                         [
                             HumanMessage(content="\n".join(self.session_history + [self.prefix])),
                         ]
-                    )            
+                    )
 
-                
                 try:
                     message_content = message.content
                     self.cost.append(message.usage_metadata)
@@ -162,6 +158,7 @@ class DialogueAgent(BaseAgent):
 class EvaluateAgent(BaseAgent):
     def reset(self) -> None:
         self.last_message: str = ""
+
     def send(self) -> str:
         if self.last_message == "":
             return ""

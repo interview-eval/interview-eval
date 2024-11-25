@@ -1,9 +1,9 @@
 # stateDiagram-v2
 #     [*] --> Initial
 #     Initial --> Question
-    
+
 #     Question --> EvaluateResponse
-    
+
 #     EvaluateResponse --> DeepDive: Technical detail needed
 #     EvaluateResponse --> Challenge: Clarification needed
 #     EvaluateResponse --> NextQuestion: Satisfactory answer
@@ -12,7 +12,7 @@
 #     DeepDive --> Question
 #     Challenge --> Question
 #     NextTopic --> Question
-    
+
 #     Conclude --> [*]
 
 
