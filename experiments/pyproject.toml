@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "interview-eval"
+version = "0.1.0"
+description = ""
+authors = ["Juyoung Suk <juyoung@kaist.ac.kr>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+json-repair = "^0.30.0"
+python-dotenv = "^1.0.1"
+pandas = "^2.2.3"
+langchain = "^0.3.7"
+langchain-openai = "^0.2.5"
+langchain-google-genai = "^2.0.4"
+langchain-huggingface = "^0.1.2"
+langchain-together = "^0.2.0"
+tokenizers = "^0.20.1"
+dotmap = "^1.3.30"
+
+
+[tool.poetry.group.dev.dependencies]
+isort = "^5.13.2"
+black = "^24.10.0"
+autoflake = "^2.3.1"
+pytest = "^8.3.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
