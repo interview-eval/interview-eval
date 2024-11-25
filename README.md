@@ -1,4 +1,4 @@
-# interview-swarm
+# interview-eval
 
 An automated interview evaluation system that simulates technical interviews using AI agents. The system consists of an AI interviewer and interviewee, conducting structured conversations based on predefined rubrics and strategies.
 
