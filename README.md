@@ -29,7 +29,7 @@ import yaml
 config = load_config("config.yaml")
 
 # Setup logging and console
-setup_logging("interview.log", verbose=True)
+logger = setup_logging("interview.log", verbose=True)
 
 # Initialize agents
 interviewer = Interviewer(config)
