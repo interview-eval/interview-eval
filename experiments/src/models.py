@@ -106,10 +106,14 @@ class Interviewer:
         except:
             pass
         if "math-interviewer" in self.model_name:
-            if prompt.split("{")[0] == MATH_MODERATOR_STATE_INIT_UNCLARIFYING_PROMPT_TEMPLATE.split("{")[0]:
+            if (
+                prompt.split("{")[0]
+                == MATH_MODERATOR_STATE_INIT_UNCLARIFYING_PROMPT_TEMPLATE.split("{")[0]
+            ):
                 return "question"
             if (
-                prompt.split("{")[0] == MATH_EVALUATOR_STATE_UNC_PROMPT_TEMPLATE.split("{")[0]
+                prompt.split("{")[0]
+                == MATH_EVALUATOR_STATE_UNC_PROMPT_TEMPLATE.split("{")[0]
             ):  # .format(initial_question="init_query",revised_question="question",feedback='feedback',deleted_information='deleted_information',solution = 'solution',answer = 'answer',Dialogue_History='history',explanation = 'explanation'):
                 return """{
     "deleted_information": "deleted_information",
@@ -123,7 +127,10 @@ class Interviewer:
                 output = DotMap()
                 output.content = "summary"
                 return output
-            if prompt.split("{")[0] == MATH_EVALUATOR_STATE_EXP_0_PROMPT_TEMPLATE.split("{")[0]:  # .format(
+            if (
+                prompt.split("{")[0]
+                == MATH_EVALUATOR_STATE_EXP_0_PROMPT_TEMPLATE.split("{")[0]
+            ):  # .format(
                 #     question="question",
                 #     solution='solution',
                 #     answer ='None',
@@ -136,13 +143,19 @@ class Interviewer:
     "feedback": "feeback"
 }"""
             if (
-                prompt.split("{")[0] == MATH_EVALUATOR_STATE_EXP_1_PROMPT_TEMPLATE.split("{")[0]
+                prompt.split("{")[0]
+                == MATH_EVALUATOR_STATE_EXP_1_PROMPT_TEMPLATE.split("{")[0]
             ):  # .format(question="question",solution='solution',answer ='None',evaluation =  '''{ "explanation": "explanation","answer correctness": "False", "solving process correctness": "False", "error type":'concept'}''',model_history='User: feeback\nUser: Question: question',model_output='System: answer'):
 
                 return """{"feedback": "feedback","feedback_type": "feedback_type"}"""
 
             if (
-                prompt.split("{")[0] == MATH_EVALUATOR_STATE_INDEPTH_SUCCESS_0_QUESTION_PROMPT_TEMPLATE.split("{")[0]
+                prompt.split("{")[0]
+                == MATH_EVALUATOR_STATE_INDEPTH_SUCCESS_0_QUESTION_PROMPT_TEMPLATE.split(
+                    "{"
+                )[
+                    0
+                ]
             ):  # .format(
                 #     initial_question="question",
                 #     solution='solution',
@@ -155,23 +168,42 @@ class Interviewer:
                 # ):
                 return """{"status" : "incomplete","feedback": "feedback"}"""
             if (
-                prompt.split("{")[0] == MATH_EVALUATOR_STATE_INDEPTH_CONCEPT_QUESTION_PROMPT_TEMPLATE.split("{")[0]
+                prompt.split("{")[0]
+                == MATH_EVALUATOR_STATE_INDEPTH_CONCEPT_QUESTION_PROMPT_TEMPLATE.split(
+                    "{"
+                )[0]
             ):  # .format(question='User: feedback',answer= 'None',solution = 'solution', Dialogue_History='User: Question: question\nSystem: answer\nUser: feeback\nUser: feedback',response = 'System: answer'):
                 return """{"status" : "incomplete","feedback": "feedback"}"""
             if (
-                prompt.split("{")[0] == MATH_EVALUATOR_STATE_INDEPTH_REASK_QUESTION_PROMPT_TEMPLATE.split("{")[0]
+                prompt.split("{")[0]
+                == MATH_EVALUATOR_STATE_INDEPTH_REASK_QUESTION_PROMPT_TEMPLATE.split(
+                    "{"
+                )[0]
             ):  # .format(initial_question='question',answer = 'None',solution='solution',Dialogue_History='User: You got a correct answer! Good Job.',response = '[\'System: answer\']') :
                 return """{"status" : "incomplete","feedback": "feedback"}"""
             if (
-                MATH_EVALUATOR_STATE_INDEPTH_QUESTION_PROMPT_INITIAL_TEMPLATE.split("{")[0] in prompt.split("{")[0]
+                MATH_EVALUATOR_STATE_INDEPTH_QUESTION_PROMPT_INITIAL_TEMPLATE.split(
+                    "{"
+                )[0]
+                in prompt.split("{")[0]
             ):  # .format(question='question',answer = 'None',solution='solution',error_type = 'concept',Dialogue_History='User: Question: question\nUser: feeback'):
                 return """{"error_type" : "concept", "feedback" : "feedback"}"""
             if (
-                prompt.split("{")[0] == MATH_EVALUATOR_STATE_INDEPTH_SUCCESS_1_QUESTION_PROMPT_TEMPLATE.split("{")[0]
+                prompt.split("{")[0]
+                == MATH_EVALUATOR_STATE_INDEPTH_SUCCESS_1_QUESTION_PROMPT_TEMPLATE.split(
+                    "{"
+                )[
+                    0
+                ]
             ):  # .format(initial_question='question',answer = 'None',solution='solution',model_solution='User: You got a correct answer! Good Job.', Dialogue_History= '[\'System: answer\']'):
                 return """{"question" : "question","answer": "answer","type": "missing_step"}"""
             if (
-                prompt.split("{")[0] == MATH_EVALUATOR_STATE_INDEPTH_SUCCESS_0_QUESTION_PROMPT_TEMPLATE.split("{")[0]
+                prompt.split("{")[0]
+                == MATH_EVALUATOR_STATE_INDEPTH_SUCCESS_0_QUESTION_PROMPT_TEMPLATE.split(
+                    "{"
+                )[
+                    0
+                ]
             ):  # .format(initial_question='question',question = 'User: question',model_solution='User: You got a correct answer! Good Job.',seed_answer = 'None',answer = 'answer: answer',solution='solution',model_output='System: answer', Dialogue_History= '[\'System: answer\']'):
                 return """{"question" : "question","answer": "answer","type": "missing_step"}"""
             if (
@@ -189,7 +221,8 @@ class Interviewer:
                     output.usage_metadata = "None"
                     return output
             if (
-                prompt.split("{")[0] == MATH_EVALUATOR_STATE_UNC_0_PROMPT_TEMPLATE.split("{")[0]
+                prompt.split("{")[0]
+                == MATH_EVALUATOR_STATE_UNC_0_PROMPT_TEMPLATE.split("{")[0]
             ):  # .format(initial_question='question',
                 # revised_question='question',
                 # deleted_information='question',
@@ -253,7 +286,10 @@ class ChatModel:
                 # other params...
             )
         elif "llama-3.1-70b" in model_name:
-            model = ChatTogether(together_api_key=os.getenv("TOGETHER_API_KEY"), model=agents_model[model_name])
+            model = ChatTogether(
+                together_api_key=os.getenv("TOGETHER_API_KEY"),
+                model=agents_model[model_name],
+            )
         else:
             llm = HuggingFacePipeline.from_model_id(
                 model_id=agents_model[model_name],

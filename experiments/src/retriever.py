@@ -11,16 +11,22 @@ from langchain_community.retrievers import BM25Retriever
 class Retriever:
     def __init__(self, task_name: str) -> None:
         if task_name not in ["depth_qa", "math"]:
-            raise ValueError("Currently only task name 'depth_qa' and math are supported.")
+            raise ValueError(
+                "Currently only task name 'depth_qa' and math are supported."
+            )
         self.task_name = task_name
         if task_name == "depth_qa":
 
             self.data_path = f"./data/{task_name}_keyword.csv"
 
             self.df = pd.read_csv(self.data_path)
-            self.df["content"] = self.df["question"] + " " + self.df["answer"] + " " + self.df["keyword"]
+            self.df["content"] = (
+                self.df["question"] + " " + self.df["answer"] + " " + self.df["keyword"]
+            )
             self.embedding = self.get_embedding_model(model_name="thenlper/gte-base")
-            self.retriever = self.get_chroma_db(texts=self.df["content"].tolist(), embedding=self.embedding)
+            self.retriever = self.get_chroma_db(
+                texts=self.df["content"].tolist(), embedding=self.embedding
+            )
         elif task_name == "math":
             ds = load_dataset("lighteval/MATH", "geometry")
             import pdb
@@ -28,15 +34,21 @@ class Retriever:
             pdb.set_trace()
             self.df = pd.DataFrame(ds["test"])
             self.embedding = self.get_embedding_model(model_name="thenlper/gte-base")
-            self.retriever = self.get_chroma_db(texts=self.df["solution"].tolist(), embedding=self.embedding)
+            self.retriever = self.get_chroma_db(
+                texts=self.df["solution"].tolist(), embedding=self.embedding
+            )
 
     @staticmethod
-    def get_embedding_model(model_name: str, cache_folder: str = None) -> HuggingFaceEmbeddings:
+    def get_embedding_model(
+        model_name: str, cache_folder: str = None
+    ) -> HuggingFaceEmbeddings:
         """Initialize the Huggingface Embedding model."""
 
         model_kwargs = {"device": "cuda:0", "model_kwargs": {"torch_dtype": "float16"}}
 
-        embed_model = HuggingFaceEmbeddings(model_name=model_name, model_kwargs=model_kwargs)
+        embed_model = HuggingFaceEmbeddings(
+            model_name=model_name, model_kwargs=model_kwargs
+        )
         return embed_model
 
     def get_chroma_db(self, texts, embedding, db_path: Union[str, None] = None):

@@ -62,8 +62,12 @@ class Moderator:
 
     def reset(self) -> None:
         if not self.session_num == 0:
-            self.global_state_flow[self.current_query_index].append(self.session_state_flow)
-            self.global_message_history[self.current_query_index].append("\n".join(self.session_history))
+            self.global_state_flow[self.current_query_index].append(
+                self.session_state_flow
+            )
+            self.global_message_history[self.current_query_index].append(
+                "\n".join(self.session_history)
+            )
             if self.store_session:
                 self.summarize_session()
         self.state_machine = StateMachine(interview_type=self.task_type)
@@ -74,7 +78,11 @@ class Moderator:
 
     def send_query(self):
         try:
-            flag = 0 if "FAIL" in self.global_state_flow[self.current_query_index][-1][-3] else 1
+            flag = (
+                0
+                if "FAIL" in self.global_state_flow[self.current_query_index][-1][-3]
+                else 1
+            )
         except:
             flag = 1
         self.current_query = self._select_queries(flag)
@@ -113,10 +121,14 @@ class Moderator:
         return current_query
 
     def get_prompt(self):
-        return self.state_machine.get_prompt(self.current_query, self.session_history, self.model)
+        return self.state_machine.get_prompt(
+            self.current_query, self.session_history, self.model
+        )
 
     def _gen_queries(self, current_query) -> dict:
-        current_query["initial_question"] = current_query["initial_question"].replace("²", "^2")
+        current_query["initial_question"] = current_query["initial_question"].replace(
+            "²", "^2"
+        )
         if self.action != "None":
             try:
                 query_generation_prompt = self.get_prompt()
@@ -131,27 +143,41 @@ class Moderator:
                 current_query["deleted_information"] = ""
                 if self.action == "unclarifying":
                     try:
-                        current_query["deleted_information"] = new_prob["deleted_information"]
+                        current_query["deleted_information"] = new_prob[
+                            "deleted_information"
+                        ]
                         current_query["explanation"] = new_prob["explanation"]
                         if current_query["deleted_information"].lower() == "none":
                             self.action = "None"
-                            current_query["revised_question"] = current_query["inital_question"]
+                            current_query["revised_question"] = current_query[
+                                "inital_question"
+                            ]
                         else:
-                            current_query["revised_question"] = new_prob["revised_question"]
+                            current_query["revised_question"] = new_prob[
+                                "revised_question"
+                            ]
                     except:
                         current_query["deleted_information"] = "None"
-                        current_query["revised_question"] = current_query["initial_question"]
+                        current_query["revised_question"] = current_query[
+                            "initial_question"
+                        ]
                         self.action = "None"
                 elif self.action == "adding":
 
                     try:
                         try:
-                            current_query["revised_question"] = new_prob["paraphrased_merged_question"]
+                            current_query["revised_question"] = new_prob[
+                                "paraphrased_merged_question"
+                            ]
                         except:
-                            current_query["revised_question"] = new_prob["merged_question"]
+                            current_query["revised_question"] = new_prob[
+                                "merged_question"
+                            ]
                     except:
                         self.action = "None"
-                        current_query["revised_question"] = current_query["initial_question"]
+                        current_query["revised_question"] = current_query[
+                            "initial_question"
+                        ]
                 elif self.action == "modifying":
                     try:
                         try:
@@ -161,14 +187,18 @@ class Moderator:
                             current_query["revised_question"] = new_prob["new_question"]
                     except:
                         self.action = "None"
-                        current_query["revised_question"] = current_query["initial_question"]
+                        current_query["revised_question"] = current_query[
+                            "initial_question"
+                        ]
 
                 elif self.action == "paraphrasing":
                     try:
                         current_query["revised_question"] = new_prob["revised_question"]
                     except:
                         self.action = "None"
-                        current_query["revised_question"] = current_query["initial_question"]
+                        current_query["revised_question"] = current_query[
+                            "initial_question"
+                        ]
             except:
                 self.action = "None"
                 current_query["revised_question"] = current_query["initial_question"]
@@ -184,7 +214,9 @@ class Moderator:
             message = self.get_prompt()
             next_speaker = self.agents_name[1]
         elif speaker == self.agents_name[1]:  # evaluator
-            message, self.action = self.state_machine.extract_message(solution=self.current_query, message=message)
+            message, self.action = self.state_machine.extract_message(
+                solution=self.current_query, message=message
+            )
             self.session_history.append(f"{speaker}: {message}")
             self.declare_state()
             if self.state_machine.state.name not in [
@@ -202,27 +234,43 @@ class Moderator:
     def declare_state(self):
         self.prev_state = self.state_machine.state
         self.state = self.state_machine.transition(
-            self.action, self.state_threshold, self.state_threshold_followup, self.followup_flag
+            self.action,
+            self.state_threshold,
+            self.state_threshold_followup,
+            self.followup_flag,
         )
         self.session_state_flow.append(self.state.name)
 
-        print(f"\n**STATE TRANSITION**\nSTATE {self.prev_state.name} -> STATE {self.state.name}\n")
+        print(
+            f"\n**STATE TRANSITION**\nSTATE {self.prev_state.name} -> STATE {self.state.name}\n"
+        )
 
     def summarize_session(self) -> None:
         summary = self._summarize(self.session_history)
-        self.global_message_summary_history[self.current_query_index // 3].append(summary)
+        self.global_message_summary_history[self.current_query_index // 3].append(
+            summary
+        )
 
     def _summarize(self, session_history):
 
         prompt = SESSION_SUMMARIZE_PROMPT.format(
-            system_name=self.agents_name[0], user_name=self.agents_name[1], session_history=session_history
+            system_name=self.agents_name[0],
+            user_name=self.agents_name[1],
+            session_history=session_history,
         )
         message = self.summarizer.invoke(prompt)
         return message.content
 
 
 class DialogueSimulator:
-    def __init__(self, agents: dict[DialogueAgent], moderator, selection_function, task_type, output_path) -> None:
+    def __init__(
+        self,
+        agents: dict[DialogueAgent],
+        moderator,
+        selection_function,
+        task_type,
+        output_path,
+    ) -> None:
         self.agents = agents
         self.moderator = moderator
         self.moderator.task_type = task_type
@@ -266,7 +314,9 @@ class DialogueSimulator:
             agent_message = speaker.send()
         else:
             agent_message = ""
-        self.next_speaker, message, state = self.moderator.receive_and_send(self.speaker, agent_message)
+        self.next_speaker, message, state = self.moderator.receive_and_send(
+            self.speaker, agent_message
+        )
         if self.speaker == self.next_speaker:
             self.inject(self.speaker, message)
             message = self.moderator.get_prompt()

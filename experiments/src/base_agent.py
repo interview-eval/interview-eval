@@ -102,13 +102,17 @@ class DialogueAgent(BaseAgent):
                 message = self.model.invoke(
                     [
                         self.system_message,
-                        HumanMessage(content="\n".join(self.session_history + [self.prefix])),
+                        HumanMessage(
+                            content="\n".join(self.session_history + [self.prefix])
+                        ),
                     ]
                 )
             else:
                 message = self.model.invoke(
                     [
-                        HumanMessage(content="\n".join(self.session_history + [self.prefix])),
+                        HumanMessage(
+                            content="\n".join(self.session_history + [self.prefix])
+                        ),
                     ]
                 )
             try:
@@ -130,13 +134,17 @@ class DialogueAgent(BaseAgent):
                     message = self.model.invoke(
                         [
                             self.system_message,
-                            HumanMessage(content="\n".join(self.session_history + [self.prefix])),
+                            HumanMessage(
+                                content="\n".join(self.session_history + [self.prefix])
+                            ),
                         ]
                     )
                 else:
                     message = self.model.invoke(
                         [
-                            HumanMessage(content="\n".join(self.session_history + [self.prefix])),
+                            HumanMessage(
+                                content="\n".join(self.session_history + [self.prefix])
+                            ),
                         ]
                     )
 

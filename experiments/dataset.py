@@ -14,11 +14,19 @@ def stat_unique(data: pd.DataFrame, key):
         print("Number of unique {}: {}".format(key, len(data[key].unique())))
         return len(data[key].unique())
     elif isinstance(key, list):
-        print("Number of unique [{}]: {}".format(",".join(key), len(data.drop_duplicates(key, keep="first"))))
+        print(
+            "Number of unique [{}]: {}".format(
+                ",".join(key), len(data.drop_duplicates(key, keep="first"))
+            )
+        )
         return len(data.drop_duplicates(key, keep="first"))
 
 
-raw_data = pd.read_csv("../../data/assistment/assistment2009.csv", encoding="utf-8", dtype={"skill_id": str})
+raw_data = pd.read_csv(
+    "../../data/assistment/assistment2009.csv",
+    encoding="utf-8",
+    dtype={"skill_id": str},
+)
 raw_data.head()
 
 raw_data = raw_data.rename(
@@ -29,7 +37,9 @@ raw_data = raw_data.rename(
         "skill_name": "knowledge_name",
     }
 )
-all_data = raw_data.loc[:, ["student_id", "question_id", "knowledge_id", "knowledge_name", "correct"]].dropna()
+all_data = raw_data.loc[
+    :, ["student_id", "question_id", "knowledge_id", "knowledge_name", "correct"]
+].dropna()
 stat_unique(all_data, None)
 a = stat_unique(all_data, ["student_id", "question_id"])
 b = stat_unique(all_data, "student_id")
@@ -75,7 +85,9 @@ for q, ks in q2k.items():
         k2q.setdefault(k, set())
         k2q[k].add(q)
 # update data
-selected_data = selected_data[selected_data.apply(lambda x: x["question_id"] in q2k, axis=1)]
+selected_data = selected_data[
+    selected_data.apply(lambda x: x["question_id"] in q2k, axis=1)
+]
 # renumber the students
 s2n = {}
 cnt = 0
@@ -83,7 +95,9 @@ for i, row in selected_data.iterrows():
     if row.student_id not in s2n:
         s2n[row.student_id] = cnt
         cnt += 1
-selected_data.loc[:, "student_id"] = selected_data.loc[:, "student_id"].apply(lambda x: s2n[x])
+selected_data.loc[:, "student_id"] = selected_data.loc[:, "student_id"].apply(
+    lambda x: s2n[x]
+)
 # renumber the questions
 q2n = {}
 cnt = 0
@@ -91,7 +105,9 @@ for i, row in selected_data.iterrows():
     if row.question_id not in q2n:
         q2n[row.question_id] = cnt
         cnt += 1
-selected_data.loc[:, "question_id"] = selected_data.loc[:, "question_id"].apply(lambda x: q2n[x])
+selected_data.loc[:, "question_id"] = selected_data.loc[:, "question_id"].apply(
+    lambda x: q2n[x]
+)
 # renumber the knowledges
 k2n = {}
 cnt = 0
@@ -160,7 +176,9 @@ if least_test_length is not None:
     student_lens = defaultdict(int)
     for t in data:
         student_lens[t[0]] += 1
-    students = [student for student in students if student_lens[student] >= least_test_length]
+    students = [
+        student for student in students if student_lens[student] >= least_test_length
+    ]
 test_students = set(students[:test_size])
 
 train_data = [record for record in data if record[0] not in test_students]
@@ -197,7 +215,9 @@ def save_to_csv(data, path):
         data: list of triplets (sid, qid, correct)
         path: str representing saving path
     """
-    pd.DataFrame.from_records(sorted(data), columns=["student_id", "question_id", "correct"]).to_csv(path, index=False)
+    pd.DataFrame.from_records(
+        sorted(data), columns=["student_id", "question_id", "correct"]
+    ).to_csv(path, index=False)
 
 
 save_to_csv(train_data, "train_triples.csv")

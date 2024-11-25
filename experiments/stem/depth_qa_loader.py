@@ -14,13 +14,19 @@ class HFDepthQALoader:
         self.node_to_q: Dict[str, str] = {}  # nodeid -> qid
         self.q_to_node: Dict[str, Set[str]] = defaultdict(set)  # qid -> set of nodeids
 
-    def load_data(self, except_questions: bool = False, remove_unused_columns: bool = True):
+    def load_data(
+        self, except_questions: bool = False, remove_unused_columns: bool = True
+    ):
         print(f"Loading data from {self.hf_repo}...")
         if not except_questions:
             # Load questions
-            questions_dataset = load_dataset(self.hf_repo, "questions", split=self.split)
+            questions_dataset = load_dataset(
+                self.hf_repo, "questions", split=self.split
+            )
             if remove_unused_columns:
-                questions_dataset = questions_dataset.remove_columns(["tutoreval_data", "augmented"])
+                questions_dataset = questions_dataset.remove_columns(
+                    ["tutoreval_data", "augmented"]
+                )
             self.questions = {item["qid"]: item for item in questions_dataset}
 
         # Load nodes
@@ -72,9 +78,13 @@ class HFDepthQALoader:
                             f"Inconsistent depth in predecessor {predec_id}: {predec_depth_nodeid} in nodeid while {predec_depth} in depth field"
                         )
                     if predec_depth != depth - 1:
-                        add_error(f"Predecessor {predec_id} of {nodeid} has incorrect depth")
+                        add_error(
+                            f"Predecessor {predec_id} of {nodeid} has incorrect depth"
+                        )
                     if nodeid not in predec_node["direct_successors"]:
-                        add_error(f"Node {nodeid} not in direct_successors of its predecessor {predec_id}")
+                        add_error(
+                            f"Node {nodeid} not in direct_successors of its predecessor {predec_id}"
+                        )
 
             # Check direct_successors
             for succ_id in node["direct_successors"]:
@@ -89,9 +99,13 @@ class HFDepthQALoader:
                             f"Inconsistent depth in successor {succ_id}: {succ_depth_nodeid} in nodeid while {succ_depth} in depth field"
                         )
                     if succ_depth != depth + 1:
-                        add_error(f"Successor {succ_id} of {nodeid} has incorrect depth")
+                        add_error(
+                            f"Successor {succ_id} of {nodeid} has incorrect depth"
+                        )
                     if nodeid not in succ_node["direct_predecessors"]:
-                        add_error(f"Node {nodeid} not in direct_predecessors of its successor {succ_id}")
+                        add_error(
+                            f"Node {nodeid} not in direct_predecessors of its successor {succ_id}"
+                        )
 
             # Check node_to_q mapping
             if not self.node_to_q.get(nodeid):

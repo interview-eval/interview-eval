@@ -28,7 +28,11 @@ def select_queries(query_list, history, current_index, flag):
     selected_queries = []
 
     # Check if all queries have been selected
-    if all(idx in history[i] for i, sublist in enumerate(query_list) for idx in range(len(sublist))):
+    if all(
+        idx in history[i]
+        for i, sublist in enumerate(query_list)
+        for idx in range(len(sublist))
+    ):
         return None, history, current_index
 
     # If index out of bounds, return "FIN"
@@ -39,19 +43,25 @@ def select_queries(query_list, history, current_index, flag):
     selected_count = len(history[current_index])
     if flag == 1:
         if selected_count < 2:
-            query = select_random_query_from_index(query_list, history, current_index, selected_queries)
+            query = select_random_query_from_index(
+                query_list, history, current_index, selected_queries
+            )
 
         else:
             current_index += 1
             query = (
-                select_random_query_from_index(query_list, history, current_index, selected_queries)
+                select_random_query_from_index(
+                    query_list, history, current_index, selected_queries
+                )
                 if current_index < len(query_list)
                 else None
             )
     else:
         current_index -= 1
         query = (
-            select_random_query_from_index(query_list, history, current_index, selected_queries)
+            select_random_query_from_index(
+                query_list, history, current_index, selected_queries
+            )
             if current_index >= 0
             else None
         )
@@ -63,7 +73,9 @@ def select_queries(query_list, history, current_index, flag):
 
 
 def select_random_query_from_index(query_list, history, index, selected_queries):
-    available_queries = [idx for idx in range(len(query_list[index])) if idx not in history[index]]
+    available_queries = [
+        idx for idx in range(len(query_list[index])) if idx not in history[index]
+    ]
     if available_queries:
         query_idx = random.choice(available_queries)
         history[index].append(query_idx)
@@ -108,7 +120,9 @@ def extract_json(text):
     except:
         pass
     try:
-        output = json.loads(re.sub(r"(?<=\{|\s)'|(?<=\s|:)'|(?<=\d)'(?!:)|'(?=\s|,|}|:)", '"', text))
+        output = json.loads(
+            re.sub(r"(?<=\{|\s)'|(?<=\s|:)'|(?<=\d)'(?!:)|'(?=\s|,|}|:)", '"', text)
+        )
         return output
     except:
         pass
@@ -153,7 +167,9 @@ def load_jsonl_file(filepath):
 
 if __name__ == "__main__":
     query_list = [["q1", "q2", "q3"], ["q4", "q5", "q6"], ["q7", "q8", "q9"]]
-    history = {i: [] for i in range(len(query_list))}  # Use index-based history tracking
+    history = {
+        i: [] for i in range(len(query_list))
+    }  # Use index-based history tracking
     current_index = 1
     flag = True
     select_queries(query_list, history, current_index, flag)

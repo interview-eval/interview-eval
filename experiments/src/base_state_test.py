@@ -80,7 +80,9 @@ class StateMachine:
                 self.action = action_set[i]
         print(self.action)
 
-    def transition(self, action, threshold: int, followup_threshold: int, followup_flag: int) -> None:
+    def transition(
+        self, action, threshold: int, followup_threshold: int, followup_flag: int
+    ) -> None:
         if action:
             self.action = action
 
@@ -174,7 +176,9 @@ class StateMachine:
                     self.success_followup.append(0.5)
             if self.interview_type.name == "STEM":
                 self.success_followup.append(self.action)
-            if (self.attempts == followup_threshold) or (self.success_followup[-1] == 1):
+            if (self.attempts == followup_threshold) or (
+                self.success_followup[-1] == 1
+            ):
                 self.state = InterviewState.MOVING_TO_NEXT_QUESTION
                 self.attempts = 0
 
@@ -197,9 +201,13 @@ class StateMachine:
     def get_initial_prompt(self, solution: Dict[str, Any]) -> str:
         # initial prompt for evaluatee
         if self.interview_type == InterviewType.MATH:
-            prompt = MATH_EVALUATEE_STATE_EXP_PROMPT_TEMPLATE.format(question=f"""{solution['revised_question']}""")
+            prompt = MATH_EVALUATEE_STATE_EXP_PROMPT_TEMPLATE.format(
+                question=f"""{solution['revised_question']}"""
+            )
         elif self.interview_type == InterviewType.STEM:
-            prompt = STEM_EVALUATEE_STATE_EXP_PROMPT_TEMPLATE.format(question=f"""{solution['revised_question']}""")
+            prompt = STEM_EVALUATEE_STATE_EXP_PROMPT_TEMPLATE.format(
+                question=f"""{solution['revised_question']}"""
+            )
         return prompt
 
     def get_math_prompt(self, solution: Dict[str, Any], session_history: list) -> str:
@@ -214,7 +222,8 @@ class StateMachine:
 
             elif str(self.action) == "unclarifying":
                 prompt = MATH_MODERATOR_STATE_INIT_UNCLARIFYING_PROMPT_TEMPLATE.format(
-                    question=f"""{inital_question}""", solution=f"""{solution['solution']}"""
+                    question=f"""{inital_question}""",
+                    solution=f"""{solution['solution']}""",
                 )
             return prompt
             # if speaker == "evaluatee":
@@ -269,7 +278,9 @@ class StateMachine:
             else:
                 indices = [-2 * i - 2 for i in range(self.attempts + 1)]
                 # Select the corresponding elements from session_history
-                selected_history = [session_history[i] for i in indices if i >= -len(session_history)]
+                selected_history = [
+                    session_history[i] for i in indices if i >= -len(session_history)
+                ]
 
                 prompt = MATH_EVALUATOR_STATE_EXP_1_PROMPT_TEMPLATE.format(
                     question=f"""{solution['initial_question']}""",
@@ -352,7 +363,9 @@ class StateMachine:
                     answer=f"""{solution['answer']}""",
                     solution=f"""{solution['solution']}""",
                     error_type=self.error_types[-1],
-                    Dialogue_History="\n".join([session_history[-5], session_history[-3], session_history[-1]]),
+                    Dialogue_History="\n".join(
+                        [session_history[-5], session_history[-3], session_history[-1]]
+                    ),
                 )
             except IndexError:
                 prompt = MATH_EVALUATOR_STATE_INDEPTH_QUESTION_PROMPT_INITIAL_TEMPLATE.format(
@@ -360,23 +373,31 @@ class StateMachine:
                     answer=f"""{solution['answer']}""",
                     solution=f"""{solution['solution']}""",
                     error_type=self.error_types[-1],
-                    Dialogue_History="\n".join([session_history[-3], session_history[-1]]),
+                    Dialogue_History="\n".join(
+                        [session_history[-3], session_history[-1]]
+                    ),
                 )
             return prompt
         elif self.state == InterviewState.SOLVE_SUCCESS:
             indices = [-2 * i - 2 for i in range(self.attempts + 1)]
-            selected_history = [session_history[i] for i in indices if i >= -len(session_history)]
-            prompt = MATH_EVALUATOR_STATE_INDEPTH_SUCCESS_1_QUESTION_PROMPT_TEMPLATE.format(
-                initial_question=f"""{solution['initial_question']}""",
-                answer=f"""{solution['answer']}""",
-                solution=f"""{solution['solution']}""",
-                Dialogue_History=selected_history,
-                model_solution=session_history[-1],
+            selected_history = [
+                session_history[i] for i in indices if i >= -len(session_history)
+            ]
+            prompt = (
+                MATH_EVALUATOR_STATE_INDEPTH_SUCCESS_1_QUESTION_PROMPT_TEMPLATE.format(
+                    initial_question=f"""{solution['initial_question']}""",
+                    answer=f"""{solution['answer']}""",
+                    solution=f"""{solution['solution']}""",
+                    Dialogue_History=selected_history,
+                    model_solution=session_history[-1],
+                )
             )
             return prompt
         return ""
 
-    def get_stem_prompt(self, solution: Dict[str, Any], session_history: list, action: str = None) -> str:
+    def get_stem_prompt(
+        self, solution: Dict[str, Any], session_history: list, action: str = None
+    ) -> str:
         if self.state == InterviewState.SESSION_START:
             inital_question = f"""{solution['initial_question']}""".replace('"', "'")
             if str(self.action) == "paraphrasing":
@@ -386,12 +407,14 @@ class StateMachine:
 
             elif str(self.action) == "modifying":
                 prompt = STEM_MODERATOR_STATE_INIT_MODIFYING_PROMPT_TEMPLATE.format(
-                    question=f"""{inital_question}""", solution=f"""{solution['solution']}"""
+                    question=f"""{inital_question}""",
+                    solution=f"""{solution['solution']}""",
                 )
 
             elif str(self.action) == "adding":
                 prompt = STEM_MODERATOR_STATE_INIT_ADDING_PROMPT_TEMPLATE.format(
-                    question=f"""{inital_question}""", solution=f"""{solution['solution']}"""
+                    question=f"""{inital_question}""",
+                    solution=f"""{solution['solution']}""",
                 )
             return prompt
             # if speaker == "evaluatee":
@@ -399,14 +422,20 @@ class StateMachine:
 
         elif self.state == InterviewState.QUESTION_SOLVING:
             if self.attempts == 0:
-                evaluation = grader_stem(solution, session_history, attempt=self.attempts, recall=False)
+                evaluation = grader_stem(
+                    solution, session_history, attempt=self.attempts, recall=False
+                )
                 self.cost_grader.append(evaluation.usage_metadata)
             else:
                 # if self.TF_answer:
                 #     evaluation = grader_stem(solution,session_history, attempt=self.attempts,model_output = self.TF_answer,recall=True)
                 # else:
                 evaluation = grader_stem(
-                    solution, session_history, attempt=self.attempts, assessment=self.TF[-1], recall=False
+                    solution,
+                    session_history,
+                    attempt=self.attempts,
+                    assessment=self.TF[-1],
+                    recall=False,
                 )
                 self.cost_grader.append(evaluation.usage_metadata)
             evaluation_json = extract_json(evaluation.content)
@@ -430,12 +459,20 @@ class StateMachine:
             else:
                 self.action = "incomplete"
             prompt = STEM_EVALUATOR_STATE_EXP_0_PROMPT_TEMPLATE.format(
-                question=f"""{solution['revised_question']}""", solution=self.TF[-1], history=session_history[-1]
+                question=f"""{solution['revised_question']}""",
+                solution=self.TF[-1],
+                history=session_history[-1],
             )
             return prompt
-        elif (self.state == InterviewState.SOLVE_FAIL) or (self.state == InterviewState.SOLVE_SUCCESS):
+        elif (self.state == InterviewState.SOLVE_FAIL) or (
+            self.state == InterviewState.SOLVE_SUCCESS
+        ):
             grade_recall = grader_stem(
-                solution, session_history, attempt=self.attempts, assessment=self.TF[-1], recall=True
+                solution,
+                session_history,
+                attempt=self.attempts,
+                assessment=self.TF[-1],
+                recall=True,
             )
             self.cost_grader.append(grade_recall.usage_metadata)
             self.recall = acc_counter_stem(grade_recall.content, recall=True)
@@ -456,27 +493,33 @@ class StateMachine:
             #     return ""
             if self.attempts == 0:
 
-                prompt = STEM_EVALUATOR_STATE_FOLLOWUP_QUESTION_1_PROMPT_TEMPLATE.format(
-                    question=solution["initial_question"],
-                    solution=solution["solution"],
-                    history=session_history[-1],
-                    followup=self.folloup_question,
+                prompt = (
+                    STEM_EVALUATOR_STATE_FOLLOWUP_QUESTION_1_PROMPT_TEMPLATE.format(
+                        question=solution["initial_question"],
+                        solution=solution["solution"],
+                        history=session_history[-1],
+                        followup=self.folloup_question,
+                    )
                 )
                 return prompt
             else:
-                prompt = STEM_EVALUATOR_STATE_FOLLOWUP_QUESTION_2_PROMPT_TEMPLATE.format(
-                    question=solution["initial_question"],
-                    solution=solution["solution"],
-                    correction=session_history[-1],
-                    feedback=session_history[-2],
-                    history=self.follow_up_types[-1],
-                    followup=self.folloup_question,
+                prompt = (
+                    STEM_EVALUATOR_STATE_FOLLOWUP_QUESTION_2_PROMPT_TEMPLATE.format(
+                        question=solution["initial_question"],
+                        solution=solution["solution"],
+                        correction=session_history[-1],
+                        feedback=session_history[-2],
+                        history=self.follow_up_types[-1],
+                        followup=self.folloup_question,
+                    )
                 )
 
                 return prompt
         return ""
 
-    def get_code_prompt(self, solution: Dict[str, Any], session_history: list, action: str = None) -> str:
+    def get_code_prompt(
+        self, solution: Dict[str, Any], session_history: list, action: str = None
+    ) -> str:
         # Implement code interview specific prompts
         return "Code interview prompt"
 
@@ -490,7 +533,9 @@ class StateMachine:
             pass
         return "Default message", "default_status"
 
-    def extract_math_message(self, solution: Dict[str, Any], message: str) -> Tuple[str, str]:
+    def extract_math_message(
+        self, solution: Dict[str, Any], message: str
+    ) -> Tuple[str, str]:
         if self.state == InterviewState.CLARIFICATION_NEEDED:
             message_json = extract_json(message)
             try:
@@ -547,7 +592,10 @@ class StateMachine:
             if self.success[-1]:
                 return "You successfully solved the problem! Good job.", "complete-seed"
             else:
-                return "This problem seems difficult. Let's move on to an easier one.", "fail"
+                return (
+                    "This problem seems difficult. Let's move on to an easier one.",
+                    "fail",
+                )
 
         elif self.state == InterviewState.QUESTION_COMPLETE:
             return "\n**Question Complete**\n", None
@@ -555,7 +603,9 @@ class StateMachine:
             return "\n**Evaluation Complete**\n", None
         return "Default message", "default_status"
 
-    def extract_stem_message(self, solution: Dict[str, Any], message: str) -> Tuple[str, str]:
+    def extract_stem_message(
+        self, solution: Dict[str, Any], message: str
+    ) -> Tuple[str, str]:
         if self.state == InterviewState.QUESTION_SOLVING:
             if self.action == "complete":
                 return "You got a correct explanation! Good Job.", self.action
@@ -570,7 +620,10 @@ class StateMachine:
                 except:
                     self.action = "incomplete"
 
-                    return "Your answer contains incorrect explanation. Try it again!", self.action
+                    return (
+                        "Your answer contains incorrect explanation. Try it again!",
+                        self.action,
+                    )
 
         elif self.state == InterviewState.SOLVE_SUCCESS:
             message_json = extract_json(message)
@@ -604,12 +657,18 @@ class StateMachine:
                     pass
                 return question, self.action
             except:
-                return "Overall Your explanation lacks depth. Can you explain a bit more?", None
+                return (
+                    "Overall Your explanation lacks depth. Can you explain a bit more?",
+                    None,
+                )
         elif self.state == InterviewState.MOVING_TO_NEXT_QUESTION:
             if self.success[-1]:
                 return "You successfully solved the problem! Good job.", "complete-seed"
             else:
-                return "This problem seems difficult. Let's move on to an easier one.", "fail"
+                return (
+                    "This problem seems difficult. Let's move on to an easier one.",
+                    "fail",
+                )
 
         elif self.state == InterviewState.QUESTION_COMPLETE:
             return "\n**Question Complete**\n", None

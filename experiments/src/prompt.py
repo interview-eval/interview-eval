@@ -1,4 +1,6 @@
-AGENT_DESCRIPTOR_SYSTEM_MESSAGE = "You can add detail to the description of the conversation participant."
+AGENT_DESCRIPTOR_SYSTEM_MESSAGE = (
+    "You can add detail to the description of the conversation participant."
+)
 
 AGENT_SPECIFIER_PROMPT_TEMPLATE = """{conversation_description}
 Please reply with a creative description of {name}, in {word_limit} words or less. 

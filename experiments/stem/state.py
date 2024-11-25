@@ -79,15 +79,23 @@ class INIT:  # initial
     def prompt(solution, action, speaker=None):
         if action == "paraphrasing":
             prompt = MODERATOR_STATE_INIT_PARAPHRASING_PROMPT_TEMPLATE.format(
-                question=solution["initial_question"].replace("{", "").replace("}", "").replace('"', "'")
+                question=solution["initial_question"]
+                .replace("{", "")
+                .replace("}", "")
+                .replace('"', "'")
             )
 
         elif action == "unclarifying":
             prompt = MODERATOR_STATE_INIT_UNCLARIFYING_PROMPT_TEMPLATE.format(
-                question=solution["initial_question"].replace("{", "").replace("}", "").replace('"', "'")
+                question=solution["initial_question"]
+                .replace("{", "")
+                .replace("}", "")
+                .replace('"', "'")
             )
         if speaker == "evaluatee":
-            prompt = EVALUATEE_STATE_EXP_PROMPT_TEMPLATE.format(question=solution["revised_question"])
+            prompt = EVALUATEE_STATE_EXP_PROMPT_TEMPLATE.format(
+                question=solution["revised_question"]
+            )
         return prompt
 
 
@@ -145,7 +153,10 @@ class FAIL:  # action
     cnt = 0
 
     def extract_message(message):
-        return "I think this problem is difficult for you. Let's move on to the easy one", "fail"
+        return (
+            "I think this problem is difficult for you. Let's move on to the easy one",
+            "fail",
+        )
 
 
 class SUCCESS:  # action

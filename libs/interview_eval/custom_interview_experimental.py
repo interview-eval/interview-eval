@@ -127,8 +127,12 @@ class AdaptiveInterviewer(Agent):
 
         context_updates = {
             "response_history": lambda x: x + [evaluation],
-            "consecutive_good_responses": lambda x: (x + 1 if answer_quality > 0.8 else 0),
-            "consecutive_weak_responses": lambda x: (x + 1 if answer_quality < 0.6 else 0),
+            "consecutive_good_responses": lambda x: (
+                x + 1 if answer_quality > 0.8 else 0
+            ),
+            "consecutive_weak_responses": lambda x: (
+                x + 1 if answer_quality < 0.6 else 0
+            ),
             "current_state": next_state,
         }
 
@@ -140,7 +144,9 @@ class AdaptiveInterviewer(Agent):
 
         return Result(value=feedback, context_variables=context_updates)
 
-    def generate_deep_dive(self, concept: str, current_understanding: str, probe_question: str) -> Result:
+    def generate_deep_dive(
+        self, concept: str, current_understanding: str, probe_question: str
+    ) -> Result:
         """
         Generate a technical deep-dive question.
         """
@@ -150,9 +156,13 @@ class AdaptiveInterviewer(Agent):
             f"{probe_question}"
         )
 
-        return Result(value=message, context_variables={"current_state": InterviewState.QUESTION})
+        return Result(
+            value=message, context_variables={"current_state": InterviewState.QUESTION}
+        )
 
-    def challenge_response(self, assumption: str, edge_case: str, challenge_question: str) -> Result:
+    def challenge_response(
+        self, assumption: str, edge_case: str, challenge_question: str
+    ) -> Result:
         """
         Challenge the candidate's assumptions.
         """
@@ -162,7 +172,9 @@ class AdaptiveInterviewer(Agent):
             f"{challenge_question}"
         )
 
-        return Result(value=message, context_variables={"current_state": InterviewState.QUESTION})
+        return Result(
+            value=message, context_variables={"current_state": InterviewState.QUESTION}
+        )
 
     def next_question(self) -> Result:
         """
@@ -178,7 +190,9 @@ class AdaptiveInterviewer(Agent):
 
             # Filter questions by topic and find closest difficulty
             topic_questions = self.question_bank[selected_topic]
-            selected_question = min(topic_questions, key=lambda q: abs(q.difficulty - target_difficulty))
+            selected_question = min(
+                topic_questions, key=lambda q: abs(q.difficulty - target_difficulty)
+            )
 
             return selected_question
 
@@ -237,7 +251,9 @@ class AdaptiveInterviewer(Agent):
             concept_performance = []
             for concept in related_concepts:
                 if concept in context["concepts_demonstrated"]:
-                    concept_performance.append(context["concepts_demonstrated"][concept])
+                    concept_performance.append(
+                        context["concepts_demonstrated"][concept]
+                    )
 
             if concept_performance:
                 avg_performance = sum(concept_performance) / len(concept_performance)
@@ -280,11 +296,17 @@ class AdaptiveInterviewRunner:
 
             # Display response
             if response.messages[-1]["content"]:
-                self.display_message(current_agent.name, response.messages[-1]["content"])
+                self.display_message(
+                    current_agent.name, response.messages[-1]["content"]
+                )
 
             # Switch agents
             messages.extend(response.messages)
-            current_agent = self.interviewee if current_agent == self.interviewer else self.interviewer
+            current_agent = (
+                self.interviewee
+                if current_agent == self.interviewer
+                else self.interviewer
+            )
 
             # Check for early termination conditions
             if self._should_terminate():
@@ -293,7 +315,9 @@ class AdaptiveInterviewRunner:
                     messages,
                     {**self.context.dict(), "force_conclude": True},
                 )
-                self.display_message(self.interviewer.name, conclude_response.messages[-1]["content"])
+                self.display_message(
+                    self.interviewer.name, conclude_response.messages[-1]["content"]
+                )
                 break
 
         return self._prepare_results()
@@ -307,7 +331,9 @@ class AdaptiveInterviewRunner:
             transient=True,
         ) as progress:
             task = progress.add_task(f"Getting {agent.name}'s response...", total=None)
-            return self.client.run(agent=agent, messages=messages, context_variables=context)
+            return self.client.run(
+                agent=agent, messages=messages, context_variables=context
+            )
 
     def _handle_state_transition(self, response: Result) -> None:
         """Update context based on response."""
@@ -330,7 +356,9 @@ class AdaptiveInterviewRunner:
             self.context.consecutive_good_responses >= 3
             or self.context.consecutive_weak_responses >= 3
             or len(self.context.response_history)
-            >= self.config["session"].get("max_questions", 10)  # Default to 10 questions if not specified
+            >= self.config["session"].get(
+                "max_questions", 10
+            )  # Default to 10 questions if not specified
         )
 
     def _prepare_results(self) -> Dict[str, Any]:
@@ -340,7 +368,9 @@ class AdaptiveInterviewRunner:
             "topics_covered": self.context.topics_covered,
             "concepts_demonstrated": self.context.concepts_demonstrated,
             "response_history": [r.dict() for r in self.context.response_history],
-            "difficulty_progression": [r.answer_quality for r in self.context.response_history],
+            "difficulty_progression": [
+                r.answer_quality for r in self.context.response_history
+            ],
         }
 
     def display_message(self, agent_name: str, content: str):

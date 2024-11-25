@@ -2,7 +2,10 @@ import json
 import re
 
 from json_repair import repair_json
-from math_reasoning.prompt import MATH_EVALUATOR_STATE_UNC_0_PROMPT_TEMPLATE, MATH_GRADER_PROMPT_TEMPLATE
+from math_reasoning.prompt import (
+    MATH_EVALUATOR_STATE_UNC_0_PROMPT_TEMPLATE,
+    MATH_GRADER_PROMPT_TEMPLATE,
+)
 from src.models import ChatModel
 from src.utils import extract_json
 from stem.prompt import (
@@ -17,7 +20,10 @@ from stem.prompt import (
 
 def grader_math(query, model_output, model="gpt-4o"):
     prompt = MATH_GRADER_PROMPT_TEMPLATE.format(
-        question=query["revised_question"], answer=query["answer"], solution=query["solution"], history=model_output
+        question=query["revised_question"],
+        answer=query["answer"],
+        solution=query["solution"],
+        history=model_output,
     )
     if type(model) == str:
         grader = ChatModel.create_model(model)
@@ -27,7 +33,9 @@ def grader_math(query, model_output, model="gpt-4o"):
     return output
 
 
-def grader_stem(query, history, model="gpt-4o", attempt=0, assessment=None, recall=False):
+def grader_stem(
+    query, history, model="gpt-4o", attempt=0, assessment=None, recall=False
+):
     if type(model) == str:
         grader = ChatModel.create_model(model)
     else:
@@ -35,14 +43,19 @@ def grader_stem(query, history, model="gpt-4o", attempt=0, assessment=None, reca
     if recall:
         if attempt == 0:
             prompt = STEM_GRADER_0_RECALL_PROMPT_TEMPLATE.format(
-                question=query["revised_question"], solution=query["solution_atom"], history=assessment
+                question=query["revised_question"],
+                solution=query["solution_atom"],
+                history=assessment,
             )
 
             output = grader.invoke(prompt)
             return output
         else:
             prompt = STEM_GRADER_1_RECALL_PROMPT_TEMPLATE.format(
-                question=query["revised_question"], feedback=history[-2], correction=history[-1], solution=assessment
+                question=query["revised_question"],
+                feedback=history[-2],
+                correction=history[-1],
+                solution=assessment,
             )
 
             output = grader.invoke(prompt)
@@ -55,7 +68,9 @@ def grader_stem(query, history, model="gpt-4o", attempt=0, assessment=None, reca
             #     output = grader.invoke(prompt)
             #     return output.content
             prompt = STEM_GRADER_0_PRECISION_PROMPT_TEMPLATE.format(
-                question=query["revised_question"], solution=query["solution"], history=history[-1]
+                question=query["revised_question"],
+                solution=query["solution"],
+                history=history[-1],
             )
 
             output = grader.invoke(prompt)
@@ -86,9 +101,15 @@ def acc_counter_stem(query, recall=False, followup=False):
         if type(query) == dict:
             try:
                 total_facts = len(query["reference_facts"])
-                correct_facts = sum(1 for fact in query["reference_facts"].values() if fact["label"] == "supported")
+                correct_facts = sum(
+                    1
+                    for fact in query["reference_facts"].values()
+                    if fact["label"] == "supported"
+                )
                 correct_facts += sum(
-                    0.5 for fact in query["reference_facts"].values() if fact["label"] == "partially supported"
+                    0.5
+                    for fact in query["reference_facts"].values()
+                    if fact["label"] == "partially supported"
                 )
                 # base_rubric = {'high':1,'middle':0,'low':-1}
                 # redun_rubric = {'low':1,'middle':0,'high':-1}
@@ -100,7 +121,9 @@ def acc_counter_stem(query, recall=False, followup=False):
                 #     if i == 'redundancy':
                 #         score =  redun_rubric[query['assessment'][i]['label']]
                 #         fine_scores += score
-                return correct_facts / total_facts  # , fine_scores/len(query['assessment'])]
+                return (
+                    correct_facts / total_facts
+                )  # , fine_scores/len(query['assessment'])]
             except:
 
                 return 0
@@ -110,10 +133,14 @@ def acc_counter_stem(query, recall=False, followup=False):
             try:
                 total_facts = len(query["follow-up question"])
                 correct_facts = sum(
-                    1 for fact in query["follow-up question"].values() if fact["correctness"] == "correct"
+                    1
+                    for fact in query["follow-up question"].values()
+                    if fact["correctness"] == "correct"
                 )
                 correct_facts += sum(
-                    0.5 for fact in query["follow-up question"].values() if fact["correctness"] == "partially correct"
+                    0.5
+                    for fact in query["follow-up question"].values()
+                    if fact["correctness"] == "partially correct"
                 )
                 # base_rubric = {'high':1,'middle':0,'low':-1}
                 # redun_rubric = {'low':1,'middle':0,'high':-1}
@@ -125,7 +152,9 @@ def acc_counter_stem(query, recall=False, followup=False):
                 #     if i == 'redundancy':
                 #         score =  redun_rubric[query['assessment'][i]['label']]
                 #         fine_scores += score
-                return correct_facts / total_facts  # , fine_scores/len(query['assessment'])]
+                return (
+                    correct_facts / total_facts
+                )  # , fine_scores/len(query['assessment'])]
             except:
 
                 return 0
@@ -138,10 +167,16 @@ def acc_counter_stem(query, recall=False, followup=False):
             try:
                 total_facts = len(query["model_atomic_facts"])
 
-                correct_facts = sum(1 for fact in query["model_atomic_facts"] if fact["correctness"] == "correct")
+                correct_facts = sum(
+                    1
+                    for fact in query["model_atomic_facts"]
+                    if fact["correctness"] == "correct"
+                )
                 try:
                     supported_facts = sum(
-                        1 for fact in query["model_atomic_facts"] if fact["reference solution coverage"] == "supported"
+                        1
+                        for fact in query["model_atomic_facts"]
+                        if fact["reference solution coverage"] == "supported"
                     )
                 except:
                     try:
@@ -162,7 +197,10 @@ def acc_counter_stem(query, recall=False, followup=False):
                     if i == "redundancy":
                         score = redun_rubric[query["assessment"][i]["label"]]
                         fine_scores += score
-                return total_facts, [correct_facts / total_facts, fine_scores / len(query["assessment"])]
+                return total_facts, [
+                    correct_facts / total_facts,
+                    fine_scores / len(query["assessment"]),
+                ]
             except:
                 return 0, [0]
         elif type(query) == str:
@@ -170,12 +208,29 @@ def acc_counter_stem(query, recall=False, followup=False):
             total_facts = len(re.findall(r'"fact_number":\s*\d+', query))
             # Count correct atomic facts (by counting occurrences of "decision": "correct")
             correct_facts = len(re.findall(r'"correctness":\s*"correct"', query))
-            correct_facts += len(re.findall(r'"correctness":\s*"partially correct"', query))
-            supported_facts = len(re.findall(r'"reference solution coverage":\s*"supported"', query))
-            supported_facts += len(re.findall(r'"reference solution coverage":\s*"partially supported"', query))
-            supported_facts = len(re.findall(r'"reference_solution_coverage":\s*"supported"', query))
-            supported_facts += len(re.findall(r'"reference_solution_coverage":\s*"partially supported"', query))
-            labels = re.findall(r"'(completeness|redundancy|readability|depth)':\s*\{'label':\s*'(\w+)'", str(query))
+            correct_facts += len(
+                re.findall(r'"correctness":\s*"partially correct"', query)
+            )
+            supported_facts = len(
+                re.findall(r'"reference solution coverage":\s*"supported"', query)
+            )
+            supported_facts += len(
+                re.findall(
+                    r'"reference solution coverage":\s*"partially supported"', query
+                )
+            )
+            supported_facts = len(
+                re.findall(r'"reference_solution_coverage":\s*"supported"', query)
+            )
+            supported_facts += len(
+                re.findall(
+                    r'"reference_solution_coverage":\s*"partially supported"', query
+                )
+            )
+            labels = re.findall(
+                r"'(completeness|redundancy|readability|depth)':\s*\{'label':\s*'(\w+)'",
+                str(query),
+            )
             try:
                 for i in labels:
                     if i[0] != "redundancy":

@@ -2,7 +2,10 @@ from typing import Callable, List, Optional, Union
 
 from openai import OpenAI
 from openai.types.chat import ChatCompletionMessage
-from openai.types.chat.chat_completion_message_tool_call import ChatCompletionMessageToolCall, Function
+from openai.types.chat.chat_completion_message_tool_call import (
+    ChatCompletionMessageToolCall,
+    Function,
+)
 
 # Third-party imports
 from pydantic import BaseModel

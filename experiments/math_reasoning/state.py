@@ -115,15 +115,23 @@ class INIT:  # initial
     def prompt(solution, action, speaker=None):
         if action == "paraphrasing":
             prompt = MODERATOR_STATE_INIT_PARAPHRASING_PROMPT_TEMPLATE.format(
-                question=solution["initial_question"].replace("{", "").replace("}", "").replace('"', "'")
+                question=solution["initial_question"]
+                .replace("{", "")
+                .replace("}", "")
+                .replace('"', "'")
             )
 
         elif action == "unclarifying":
             prompt = MODERATOR_STATE_INIT_UNCLARIFYING_PROMPT_TEMPLATE.format(
-                question=solution["initial_question"].replace("{", "").replace("}", "").replace('"', "'")
+                question=solution["initial_question"]
+                .replace("{", "")
+                .replace("}", "")
+                .replace('"', "'")
             )
         if speaker == "evaluatee":
-            prompt = EVALUATEE_STATE_EXP_PROMPT_TEMPLATE.format(question=solution["revised_question"])
+            prompt = EVALUATEE_STATE_EXP_PROMPT_TEMPLATE.format(
+                question=solution["revised_question"]
+            )
         return prompt
 
 
@@ -169,7 +177,9 @@ class EXP:  # explore
         else:
             indices = [-2 * i - 2 for i in range(EXP.cnt + 1)]
             # Select the corresponding elements from session_history
-            selected_history = [session_history[i] for i in indices if i >= -len(session_history)]
+            selected_history = [
+                session_history[i] for i in indices if i >= -len(session_history)
+            ]
 
             prompt = EVALUATOR_STATE_EXP_1_PROMPT_TEMPLATE.format(
                 question=solution["initial_question"],
@@ -229,7 +239,9 @@ class FAIL:  # action
                 question=solution["initial_question"],
                 answer=solution["answer"],
                 solution=solution["solution"],
-                Dialogue_History="\n".join([session_history[-5], session_history[-3], session_history[-1]]),
+                Dialogue_History="\n".join(
+                    [session_history[-5], session_history[-3], session_history[-1]]
+                ),
             )
         except:
             prompt = EVALUATOR_STATE_INDEPTH_QUESTION_PROMPT_INITIAL_TEMPLATE.format(
@@ -250,7 +262,10 @@ class FAIL_INS:  # action
     cnt = 0
 
     def extract_message(message, solution=None, cnt=None):
-        return "I think this problem is difficult for you. Let's move on to the easy one", "fail"
+        return (
+            "I think this problem is difficult for you. Let's move on to the easy one",
+            "fail",
+        )
 
 
 class SUCCESS:  # action

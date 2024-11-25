@@ -24,7 +24,8 @@ def main(config: str, verbose: bool):
     # Show welcome message
     console.print(
         Panel(
-            "[green]Automated Interview System[/green]\n" "[cyan]Use Ctrl+C to exit at any time[/cyan]",
+            "[green]Automated Interview System[/green]\n"
+            "[cyan]Use Ctrl+C to exit at any time[/cyan]",
             border_style="green",
             padding=(1, 2),
         )

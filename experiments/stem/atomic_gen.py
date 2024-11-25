@@ -20,7 +20,9 @@ saved_log = pd.read_csv("solution_atom.csv")
 for item in dataset.iterrows():
     if item[1]["nodeid"] in saved_log["nodeid"]:
         continue
-    prompt = STEM_ATOMIC_FACT_GENERATOR_PROMPT_TEMPLATE.format(input=item[1]["solution"])
+    prompt = STEM_ATOMIC_FACT_GENERATOR_PROMPT_TEMPLATE.format(
+        input=item[1]["solution"]
+    )
     model = ChatModel.create_model("gpt-4o")
     try:
         output = model.invoke(prompt)

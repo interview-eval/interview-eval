@@ -7,7 +7,12 @@ from datasets import load_dataset
 
 
 class HFMATHLoader:
-    def __init__(self, hf_repo: str = "openai/GSM8K", split: str = "train", category: str = "main"):
+    def __init__(
+        self,
+        hf_repo: str = "openai/GSM8K",
+        split: str = "train",
+        category: str = "main",
+    ):
         self.hf_repo = hf_repo
         self.split = split
         self.category = category
@@ -19,7 +24,9 @@ class HFMATHLoader:
         ]
         return message_format
 
-    def load_data(self, except_questions: bool = False, remove_unused_columns: bool = True):
+    def load_data(
+        self, except_questions: bool = False, remove_unused_columns: bool = True
+    ):
         print(f"Loading data from {self.hf_repo}...")
         self.ds = pd.DataFrame(load_dataset(self.hf_repo, self.category)[self.split])
 

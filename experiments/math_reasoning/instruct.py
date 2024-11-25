@@ -7,11 +7,17 @@ from datasets import load_dataset
 
 
 class HFMATHLoader:
-    def __init__(self, hf_repo: str = "allenai/tulu-v3.1-mix-preview-4096-OLMoE", split: str = "train"):
+    def __init__(
+        self,
+        hf_repo: str = "allenai/tulu-v3.1-mix-preview-4096-OLMoE",
+        split: str = "train",
+    ):
         self.hf_repo = hf_repo
         self.split = split
 
-    def load_data(self, except_questions: bool = False, remove_unused_columns: bool = True):
+    def load_data(
+        self, except_questions: bool = False, remove_unused_columns: bool = True
+    ):
         print(f"Loading data from {self.hf_repo}...")
         self.ds = pd.DataFrame(load_dataset(self.hf_repo)[self.split])
 

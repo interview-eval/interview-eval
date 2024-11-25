@@ -60,9 +60,15 @@ def calculate_src_cov_num(data):
         try:
             relevant_yes = sum(1 for fact in data if fact["relevance"].lower() == "yes")
         except:
-            relevant_yes = sum(1 for fact in data if fact["reference_solution_coverage"].lower() == "yes")
+            relevant_yes = sum(
+                1
+                for fact in data
+                if fact["reference_solution_coverage"].lower() == "yes"
+            )
     except:
-        relevant_yes = sum(1 for fact in data if fact["reference solution coverage"].lower() == "yes")
+        relevant_yes = sum(
+            1 for fact in data if fact["reference solution coverage"].lower() == "yes"
+        )
     # Calculate the ratio
     return relevant_yes
 
@@ -341,7 +347,9 @@ def analyze_feedback_distribution(df, task):
                 if isinstance(feedback_types, list):
                     # Filter out "affirmation" feedback
 
-                    feedback_types = [fb for fb in feedback_types if "Affirmation" not in fb]
+                    feedback_types = [
+                        fb for fb in feedback_types if "Affirmation" not in fb
+                    ]
 
                     # Separate feedback types based on correctness_main
                     if correctness_main == True:
@@ -372,7 +380,9 @@ def analyze_feedback_distribution(df, task):
                 else:
 
                     feedback_false.extend(feedback_types)
-                    output_dict_false = convert_labels(feedback_types, output_dict_false)
+                    output_dict_false = convert_labels(
+                        feedback_types, output_dict_false
+                    )
             except (ValueError, SyntaxError):
                 # Skip rows where there's an issue with the string conversion
                 continue
@@ -387,11 +397,19 @@ def analyze_feedback_distribution(df, task):
         total_false = sum(feedback_false_counts.values())
 
         # Convert counts to rates (percentage of total)
-        feedback_true_rates = {k: v / total_true for k, v in feedback_true_counts.items()} if total_true > 0 else {}
-        feedback_false_rates = (
-            {k: v / total_false for k, v in feedback_false_counts.items()} if total_false > 0 else {}
+        feedback_true_rates = (
+            {k: v / total_true for k, v in feedback_true_counts.items()}
+            if total_true > 0
+            else {}
         )
-        feedback_true_rates_sorted = dict(sorted(feedback_true_rates.items(), key=lambda item: item[1], reverse=True))
+        feedback_false_rates = (
+            {k: v / total_false for k, v in feedback_false_counts.items()}
+            if total_false > 0
+            else {}
+        )
+        feedback_true_rates_sorted = dict(
+            sorted(feedback_true_rates.items(), key=lambda item: item[1], reverse=True)
+        )
         feedback_false_rates_sorted = dict(
             sorted(feedback_false_rates.items(), key=lambda item: item[1], reverse=True)
         )
@@ -408,13 +426,15 @@ def calculate_followup_accuracy(df, task):
     # Calculate accuracy for the followup in both cases (correctness_followup >= 1 is regarded as correct)
     try:
         followup_accuracy_main_true = [
-            (float(max(eval(i))) >= 1) if eval(i) != [] else 0 for i in main_true_df["correctness_followup"]
+            (float(max(eval(i))) >= 1) if eval(i) != [] else 0
+            for i in main_true_df["correctness_followup"]
         ].count(True) / len(main_true_df)
     except:
         followup_accuracy_main_true = 0
     try:
         followup_accuracy_main_false = [
-            (float(max(eval(i))) >= 1) if eval(i) != [] else 0 for i in main_false_df["correctness_followup"]
+            (float(max(eval(i))) >= 1) if eval(i) != [] else 0
+            for i in main_false_df["correctness_followup"]
         ].count(True) / len(main_false_df)
     except:
         followup_accuracy_main_false = 0
@@ -451,7 +471,9 @@ if __name__ == "__main__":
             continue
 
         try:
-            accuracy_A, accuracy_B, accuracy_C, follwoup_Acc = calculate_accuracies(df, task)
+            accuracy_A, accuracy_B, accuracy_C, follwoup_Acc = calculate_accuracies(
+                df, task
+            )
         except:
             import pdb
 
@@ -465,7 +487,9 @@ if __name__ == "__main__":
                 import pdb
 
                 pdb.set_trace()
-            followup_accuracy_true, followup_accuracy_false = calculate_followup_accuracy(df, task)
+            followup_accuracy_true, followup_accuracy_false = (
+                calculate_followup_accuracy(df, task)
+            )
             write_csv_row(
                 [
                     model,
@@ -481,4 +505,7 @@ if __name__ == "__main__":
                 output_path,
             )
         else:
-            write_csv_row([model] + [accuracy_A] + [accuracy_B] + [accuracy_C] + [follwoup_Acc], output_path)
+            write_csv_row(
+                [model] + [accuracy_A] + [accuracy_B] + [accuracy_C] + [follwoup_Acc],
+                output_path,
+            )

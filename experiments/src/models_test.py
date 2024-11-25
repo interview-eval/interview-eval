@@ -44,7 +44,9 @@ class Interviewer:
 
         pdb.set_trace()
         if "math-interviewer" in self.model_name:
-            if prompt == MATH_MODERATOR_STATE_INIT_UNCLARIFYING_PROMPT_TEMPLATE.format(question="question"):
+            if prompt == MATH_MODERATOR_STATE_INIT_UNCLARIFYING_PROMPT_TEMPLATE.format(
+                question="question"
+            ):
                 return "Question: modified question"
             if prompt == MATH_EVALUATOR_STATE_UNC_PROMPT_TEMPLATE.format(
                 initial_question="init_query",
@@ -85,47 +87,62 @@ class Interviewer:
             ):
                 return """{"feedback": "feedback","feedback_type": "feedback_type"}"""
 
-            if prompt == MATH_EVALUATOR_STATE_INDEPTH_SUCCESS_0_QUESTION_PROMPT_TEMPLATE.format(
-                initial_question="Question: modified question",
-                solution="solution",
-                seed_answer="answer",
-                Dialogue_History="history",
-                answer="answer",
-                question="question",
-                model_output="answer",
-                model_solution="solution",
+            if (
+                prompt
+                == MATH_EVALUATOR_STATE_INDEPTH_SUCCESS_0_QUESTION_PROMPT_TEMPLATE.format(
+                    initial_question="Question: modified question",
+                    solution="solution",
+                    seed_answer="answer",
+                    Dialogue_History="history",
+                    answer="answer",
+                    question="question",
+                    model_output="answer",
+                    model_solution="solution",
+                )
             ):
                 return """{"status" : "incomplete","feedback": "feedback"}"""
-            if prompt == MATH_EVALUATOR_STATE_INDEPTH_CONCEPT_QUESTION_PROMPT_TEMPLATE.format(
-                question="question",
-                answer="answer",
-                solution="solution",
-                Dialogue_History="history",
-                response="answer",
+            if (
+                prompt
+                == MATH_EVALUATOR_STATE_INDEPTH_CONCEPT_QUESTION_PROMPT_TEMPLATE.format(
+                    question="question",
+                    answer="answer",
+                    solution="solution",
+                    Dialogue_History="history",
+                    response="answer",
+                )
             ):
                 return """{"status" : "incomplete","feedback": "feedback"}"""
-            if prompt == MATH_EVALUATOR_STATE_INDEPTH_REASK_QUESTION_PROMPT_TEMPLATE.format(
-                initial_question="question",
-                answer="answer",
-                solution="solution",
-                Dialogue_History="history",
-                response="answer",
+            if (
+                prompt
+                == MATH_EVALUATOR_STATE_INDEPTH_REASK_QUESTION_PROMPT_TEMPLATE.format(
+                    initial_question="question",
+                    answer="answer",
+                    solution="solution",
+                    Dialogue_History="history",
+                    response="answer",
+                )
             ):
                 return """{"status" : "incomplete","feedback": "feedback"}"""
-            if prompt == MATH_EVALUATOR_STATE_INDEPTH_QUESTION_PROMPT_INITIAL_TEMPLATE.format(
-                question="question",
-                answer="answer",
-                solution="solution",
-                error_type="concept",
-                Dialogue_History="history",
+            if (
+                prompt
+                == MATH_EVALUATOR_STATE_INDEPTH_QUESTION_PROMPT_INITIAL_TEMPLATE.format(
+                    question="question",
+                    answer="answer",
+                    solution="solution",
+                    error_type="concept",
+                    Dialogue_History="history",
+                )
             ):
                 return """{"error_type" : "concept", "feedback" : "feedback"}"""
-            if prompt == MATH_EVALUATOR_STATE_INDEPTH_SUCCESS_1_QUESTION_PROMPT_TEMPLATE.format(
-                initial_question="question",
-                answer="answer",
-                solution="solution",
-                Dialogue_History="history",
-                model_solution="answer",
+            if (
+                prompt
+                == MATH_EVALUATOR_STATE_INDEPTH_SUCCESS_1_QUESTION_PROMPT_TEMPLATE.format(
+                    initial_question="question",
+                    answer="answer",
+                    solution="solution",
+                    Dialogue_History="history",
+                    model_solution="answer",
+                )
             ):
                 return """{"question" : "question","answer": "answer","type": "missing_step"}"""
 

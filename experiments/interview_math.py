@@ -8,12 +8,21 @@ from datasets import load_dataset
 from dotenv import load_dotenv
 from langchain.schema import HumanMessage, SystemMessage
 from langchain_openai import AzureChatOpenAI, ChatOpenAI
-from math_reasoning.temp_data import MATH_GEO_LEVEL_2, MATH_GEO_LEVEL_3, MATH_GEO_LEVEL_4, MATH_GEO_LEVEL_5
+from math_reasoning.temp_data import (
+    MATH_GEO_LEVEL_2,
+    MATH_GEO_LEVEL_3,
+    MATH_GEO_LEVEL_4,
+    MATH_GEO_LEVEL_5,
+)
 from src.base_agent import DialogueAgent, EvaluateAgent
 from src.base_state import InterviewState, InterviewType
 from src.dialogue import DialogueSimulator, Moderator, select_next_speaker
 from src.models import ChatModel
-from src.prompt import AGENT_DESCRIPTOR_SYSTEM_MESSAGE, AGENT_SPECIFIER_PROMPT_TEMPLATE, SYSTEM_MESSAGE_TEMPLATE
+from src.prompt import (
+    AGENT_DESCRIPTOR_SYSTEM_MESSAGE,
+    AGENT_SPECIFIER_PROMPT_TEMPLATE,
+    SYSTEM_MESSAGE_TEMPLATE,
+)
 from src.utils import extract_boxed_str, load_jsonl_file
 
 load_dotenv()
@@ -36,7 +45,9 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def generate_agent_description(name: str, conversation_description: str, word_limit: int) -> str:
+def generate_agent_description(
+    name: str, conversation_description: str, word_limit: int
+) -> str:
 
     role_description = (
         "an Evaluator that assess the System's ability"
@@ -54,10 +65,16 @@ def generate_agent_description(name: str, conversation_description: str, word_li
             )
         ),
     ]
-    return ChatOpenAI(temperature=1.0, model="gpt-4o-2024-05-13").invoke(agent_specifier_prompt).content
+    return (
+        ChatOpenAI(temperature=1.0, model="gpt-4o-2024-05-13")
+        .invoke(agent_specifier_prompt)
+        .content
+    )
 
 
-def generate_system_message(name: str, description: str, conversation_description: str) -> str:
+def generate_system_message(
+    name: str, description: str, conversation_description: str
+) -> str:
     return SYSTEM_MESSAGE_TEMPLATE.format(
         conversation_description=conversation_description,
         name=name,
@@ -93,11 +110,15 @@ def seed_question(N):
 
 
 def create_agents(
-    names: List[str], agent_system_messages: Dict[str, str], agents_model: Dict[str, str]
+    names: List[str],
+    agent_system_messages: Dict[str, str],
+    agents_model: Dict[str, str],
 ) -> Dict[str, DialogueAgent]:
     agents = {}
     for name in names:
-        agent_class = EvaluateAgent if name.lower() in ["evaluator", "user"] else DialogueAgent
+        agent_class = (
+            EvaluateAgent if name.lower() in ["evaluator", "user"] else DialogueAgent
+        )
 
         model = ChatModel.create_model(agents_model[name.lower()])
         agents[name] = agent_class(
@@ -128,10 +149,14 @@ def main():
     word_limit = 50
     names_list = [["System", "User"], ["Evaluatee", "Evaluator"]]
     names = names_list[args.names]
-    conversation_description = f"Here is the scenario: {topic}\nThe participants are: {', '.join(names)}"
+    conversation_description = (
+        f"Here is the scenario: {topic}\nThe participants are: {', '.join(names)}"
+    )
     # Moderator Setting
     moderator = Moderator(
-        model=ChatOpenAI(model=args.model_moderator, temperature=0.2).bind(response_format={"type": "json_object"}),
+        model=ChatOpenAI(model=args.model_moderator, temperature=0.2).bind(
+            response_format={"type": "json_object"}
+        ),
         summarizer=ChatOpenAI(model=args.model_moderator, temperature=0.2),
         system_message=SystemMessage(content=""),
         queries=seed_questions,
