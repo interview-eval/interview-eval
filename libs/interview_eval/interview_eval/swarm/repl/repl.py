@@ -57,9 +57,7 @@ def pretty_print_messages(messages) -> None:
             print(f"\033[95m{name}\033[0m({arg_str[1:-1]})")
 
 
-def run_demo_loop(
-    starting_agent, context_variables=None, stream=False, debug=False
-) -> None:
+def run_demo_loop(starting_agent, context_variables=None, stream=False, debug=False) -> None:
     client = Swarm()
     print("Starting Swarm CLI 🐝")
 

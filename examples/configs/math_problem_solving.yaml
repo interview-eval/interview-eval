@@ -34,6 +34,7 @@ interviewer:
       - "Request alternative solution methods"
       - "Probe for deeper understanding on correct answers"
       - "Identify misconceptions in incorrect answers"
+  seed_question: "Natalia sold clips to 48 of her friends in April, and then she sold half as many clips in May. How many clips did Natalia sell altogether in April and May?"
 
   # Grading Rubric
   rubric: |

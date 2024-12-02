@@ -1,6 +1,6 @@
 .PHONY: style
 
-check_dirs := interview-eval tests
+check_dirs := interview_eval/
 
 style:
 	uv run isort $(check_dirs)

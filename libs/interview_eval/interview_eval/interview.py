@@ -1,12 +1,23 @@
 import logging
+
+# import dataclass
+from dataclasses import dataclass
 from typing import Any, Dict, Optional
 
 import yaml
-from interview_eval.swarm import Agent, Result, Swarm
 from openai import OpenAI
 from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
+
+from interview_eval.swarm import Agent, Result, Swarm
+
+
+@dataclass
+class Response:
+    messages: list
+    agent: Agent
+    context_variables: dict
 
 
 class Interviewer(Agent):
@@ -32,6 +43,8 @@ class Interviewer(Agent):
             functions=[self.conclude_interview],
             client=client,
         )
+
+        self.seed_question = interviewer_config.get("seed_question", "")
 
     def conclude_interview(self, score: int, comments: str) -> Result:
         """End interview with final assessment.
@@ -89,12 +102,9 @@ class InterviewRunner:
         self.logger = logger
         self.console = console
         self.questions_count = 0
-        self.max_questions = config["session"].get(
-            "max_questions", 10
-        )  # Default to 10 questions if not specified
-        self.max_retries = config["session"].get(
-            "max_retries", 2
-        )  # Default to 2 retries if not specified
+        self.max_questions = config["session"].get("max_questions", 10)  # Default to 10 questions if not specified
+        self.max_retries = config["session"].get("max_retries", 2)  # Default to 2 retries if not specified
+        self.seed_question_used = False
 
     def display_message(self, agent_name: str, content: str):
         """Display a message with proper formatting."""
@@ -137,9 +147,7 @@ class InterviewRunner:
             transient=True,
         ) as progress:
             task = progress.add_task("Processing response...", total=None)
-            return self.client.run(
-                agent=agent, messages=messages, context_variables=context
-            )
+            return self.client.run(agent=agent, messages=messages, context_variables=context)
 
     # TODO: Refactor this method to make it more readable
     def run(self) -> Dict[str, Any]:
@@ -157,30 +165,54 @@ class InterviewRunner:
         self.display_message(response.agent.name, response.messages[-1]["content"])
 
         while not response.context_variables.get("interview_complete", False):
-            next_agent = (
-                self.interviewer
-                if response.agent == self.interviewee
-                else self.interviewee
-            )
+            next_agent = self.interviewer if response.agent == self.interviewee else self.interviewee
             previous_response_content = response.messages[-1]["content"]
 
             if next_agent == self.interviewer:
                 # Next speaker is interviewer
                 self.questions_count += 1
                 self.console.print(f"\n[info]Question {self.questions_count}[/info]")
-                interviewer_messages.extend(
-                    [
-                        {"role": "user", "content": previous_response_content},
-                    ]
-                )
-                interviewee_messages.extend(
-                    [
-                        {"role": "assistant", "content": previous_response_content},
-                    ]
-                )
-                response = self._get_response(
-                    next_agent, interviewer_messages, response.context_variables
-                )
+
+                if (
+                    not self.seed_question_used
+                    and hasattr(self.interviewer, "seed_question")
+                    and self.interviewer.seed_question
+                ):
+                    # Use the seed question for the first question
+                    interviewer_messages.extend(
+                        [
+                            {"role": "user", "content": previous_response_content},
+                        ]
+                    )
+                    interviewee_messages.extend(
+                        [
+                            {"role": "assistant", "content": previous_response_content},
+                        ]
+                    )
+
+                    interviewer_response = Response(
+                        messages=[{"role": "assistant", "content": self.interviewer.seed_question}],
+                        agent=self.interviewer,
+                        context_variables={},
+                    )
+                    self.seed_question_used = True
+                else:
+                    # Generate a question as usual
+                    interviewer_messages.extend(
+                        [
+                            {"role": "user", "content": previous_response_content},
+                        ]
+                    )
+                    interviewee_messages.extend(
+                        [
+                            {"role": "assistant", "content": previous_response_content},
+                        ]
+                    )
+                    interviewer_response = self._get_response(
+                        next_agent, interviewer_messages, response.context_variables
+                    )
+
+                response = interviewer_response
             else:
                 # Next speaker is interviewee
                 interviewer_messages.extend(
@@ -193,20 +225,13 @@ class InterviewRunner:
                         {"role": "user", "content": previous_response_content},
                     ]
                 )
-                response = self._get_response(
-                    next_agent, interviewee_messages, response.context_variables
-                )
+                response = self._get_response(next_agent, interviewee_messages, response.context_variables)
 
             self.display_message(response.agent.name, response.messages[-1]["content"])
 
             # 1. Check end conditions for the interview
-            if (
-                response.agent == self.interviewee
-                and self.questions_count >= self.max_questions
-            ):
-                final_message = (
-                    "Maximum number of questions reached. Concluding interview."
-                )
+            if response.agent == self.interviewee and self.questions_count >= self.max_questions:
+                final_message = "Maximum number of questions reached. Concluding interview."
                 self.console.print(f"\n[warning]{final_message}[/warning]")
 
                 interviewer_messages.extend(
@@ -219,12 +244,8 @@ class InterviewRunner:
                     ]
                 )
 
-                response = self._get_response(
-                    self.interviewer, interviewer_messages, {"force_conclude": True}
-                )
-                self.display_message(
-                    response.agent.name, response.messages[-1]["content"]
-                )
+                response = self._get_response(self.interviewer, interviewer_messages, {"force_conclude": True})
+                self.display_message(response.agent.name, response.messages[-1]["content"])
                 break
 
         results = {

@@ -15,9 +15,7 @@ class DecontaminatedQuestion(TypedDict):
     method: DecontaminationType
 
 
-def decontaminate_unclarifying(
-    question: str, reference_answer: str, client: OpenAI, model: str
-) -> dict:
+def decontaminate_unclarifying(question: str, reference_answer: str, client: OpenAI, model: str) -> dict:
     prompt = """Remove some necessary information from this question while keeping it grammatically correct. 
     The removed info should be required to provide a complete answer. Return JSON with:
     - transformed_question: Question with key info removed
@@ -37,9 +35,7 @@ def decontaminate_unclarifying(
     return eval(response.choices[0].message.content)
 
 
-def decontaminate_paraphrasing(
-    question: str, reference_answer: str, client: OpenAI, model: str
-) -> dict:
+def decontaminate_paraphrasing(question: str, reference_answer: str, client: OpenAI, model: str) -> dict:
     prompt = """Paraphrase this question and answer while preserving exact meaning. 
     Use different words and sentence structure. Return JSON with:
     - transformed_question: Paraphrased question 
@@ -59,9 +55,7 @@ def decontaminate_paraphrasing(
     return eval(response.choices[0].message.content)
 
 
-def decontaminate_modifying(
-    question: str, reference_answer: str, client: OpenAI, model: str
-) -> dict:
+def decontaminate_modifying(question: str, reference_answer: str, client: OpenAI, model: str) -> dict:
     prompt = """Create a new but related question that can be answered using similar knowledge from the reference answer.
     Keep domain and difficulty similar. Return JSON with:
     - transformed_question: New related question
@@ -99,9 +93,7 @@ def decontaminate_question(
     }
 
     try:
-        transformed = decontamination_methods[method](
-            question, reference_answer, client, model
-        )
+        transformed = decontamination_methods[method](question, reference_answer, client, model)
 
         return DecontaminatedQuestion(
             question=transformed["transformed_question"],

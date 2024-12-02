@@ -29,3 +29,7 @@ dev = [
     "isort>=5.13.2",
     "pytest>=8.3.3",
 ]
+
+[tool.setuptools]
+packages = ["interview_eval"]
+

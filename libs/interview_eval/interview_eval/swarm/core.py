@@ -37,11 +37,7 @@ class Swarm:
         debug: bool,
     ) -> ChatCompletionMessage:
         context_variables = defaultdict(str, context_variables)
-        instructions = (
-            agent.instructions(context_variables)
-            if callable(agent.instructions)
-            else agent.instructions
-        )
+        instructions = agent.instructions(context_variables) if callable(agent.instructions) else agent.instructions
         messages = [{"role": "system", "content": instructions}] + history
         debug_print(debug, "Getting chat completion for...:", messages)
 
@@ -207,9 +203,7 @@ class Swarm:
                 tool_calls.append(tool_call_object)
 
             # handle function calls, updating context_variables, and switching agents
-            partial_response = self.handle_tool_calls(
-                tool_calls, active_agent.functions, context_variables, debug
-            )
+            partial_response = self.handle_tool_calls(tool_calls, active_agent.functions, context_variables, debug)
             history.extend(partial_response.messages)
             context_variables.update(partial_response.context_variables)
             if partial_response.agent:
@@ -263,9 +257,7 @@ class Swarm:
             message = completion.choices[0].message
             debug_print(debug, "Received completion:", message)
             message.sender = active_agent.name
-            history.append(
-                json.loads(message.model_dump_json())
-            )  # to avoid OpenAI types (?)
+            history.append(json.loads(message.model_dump_json()))  # to avoid OpenAI types (?)
 
             if not message.tool_calls or not execute_tools:
                 debug_print(debug, "Ending turn.")
