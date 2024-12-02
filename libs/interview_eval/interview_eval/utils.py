@@ -34,16 +34,19 @@ def setup_logging(config: dict, verbose: bool) -> logging.Logger:
     formatter = logging.Formatter("%(asctime)s - %(message)s")
 
     # Setup file handler if enabled
-    if config["logging"]["save_to_file"]:
-        output_dir = Path(config["logging"]["output_dir"])
-        output_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        if config["logging"]["save_to_file"]:
+            output_dir = Path(config["logging"]["output_dir"])
+            output_dir.mkdir(parents=True, exist_ok=True)
 
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = config["logging"]["filename_template"].format(timestamp=timestamp)
-        file_handler = logging.FileHandler(output_dir / filename)
-        file_handler.setFormatter(formatter)
-        file_handler.setLevel(logging.INFO)
-        logger.addHandler(file_handler)
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = config["logging"]["filename_template"].format(timestamp=timestamp)
+            file_handler = logging.FileHandler(output_dir / filename)
+            file_handler.setFormatter(formatter)
+            file_handler.setLevel(logging.INFO)
+            logger.addHandler(file_handler)
+    except KeyError:
+        return None   
 
     return logger
 
