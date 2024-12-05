@@ -229,6 +229,12 @@ class InterviewRunner:
 
             self.display_message(response.agent.name, response.messages[-1]["content"])
 
+            if response.agent == self.interviewee:      
+                last_msg_content = "Question: " + interviewee_messages[-1]["content"] + "\nResponse: "+ response.messages[-1]["content"]
+                fmsg = [{"role": "user", "content": f"Provide a concise language critique in 2 sentences evaluating the response based the previous question. Provide rationale.\n{last_msg_content}"}]
+                temp_msg = self._get_response(self.interviewer, fmsg, {})
+                self.display_message("Feedback Agent", temp_msg.messages[-1]["content"])
+
             # 1. Check end conditions for the interview
             if response.agent == self.interviewee and self.questions_count >= self.max_questions:
                 final_message = "Maximum number of questions reached. Concluding interview."

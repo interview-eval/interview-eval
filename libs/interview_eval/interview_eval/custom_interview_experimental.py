@@ -16,6 +16,9 @@ class Response:
     context_variables: dict
 
 
+EVAL_AGENT_INSTRUCTION = "Based on the grading rubirc, provide a critique that evaluates the response quality."
+QUESTION_AGENT_INSTRUCTION = "Ask a follow up question based on the previous history."
+
 class EvaluationAgent(Agent):
     def __init__(
         self,
@@ -28,7 +31,7 @@ class EvaluationAgent(Agent):
         client = OpenAI(**client_kwargs) if client_kwargs else OpenAI()
 
         instructions = (
-            eval_config["instructions"] + f"\nRubric:\n{eval_config['rubric']}"
+            EVAL_AGENT_INSTRUCTION + f"\nRubric:\n{eval_config['rubric']}"
         )
 
         super().__init__(
@@ -36,25 +39,6 @@ class EvaluationAgent(Agent):
             instructions=instructions,
             client=client,
         )
-
-    def evaluate_response(self, response: str) -> Result:
-        """Evaluate interviewee response and provide critique"""
-        return Result(
-            value=self.get_completion(
-                [{"role": "user", "content": f"Evaluate this response: {response}"}]
-            ),
-            context_variables={
-                "evaluation": self.get_completion(
-                    [
-                        {
-                            "role": "user",
-                            "content": f"Provide difficulty assessment (easier/same/harder) for next question based on this response: {response}",
-                        }
-                    ]
-                )
-            },
-        )
-
 
 class QuestionAgent(Agent):
     def __init__(
@@ -69,7 +53,7 @@ class QuestionAgent(Agent):
 
 
         instructions = (
-            question_config["instructions"]
+            QUESTION_AGENT_INSTRUCTION
             + f"\nQuestion Strategy:\n{yaml.dump(question_config['strategy'], default_flow_style=False)}"
         )
 
@@ -79,23 +63,6 @@ class QuestionAgent(Agent):
             client=client,
         )
         self.seed_question = question_config["seed_question"]
-
-
-    def generate_question(
-        self, previous_response: str, difficulty_adjustment: str
-    ) -> Result:
-        """Generate next question based on previous response and difficulty adjustment"""
-        return Result(
-            value=self.get_completion(
-                [
-                    {
-                        "role": "user",
-                        "content": f"Previous response: {previous_response}\nDifficulty adjustment: {difficulty_adjustment}\nGenerate next question:",
-                    }
-                ]
-            ),
-            context_variables={},
-        )
 
 
 class EnhancedInterviewRunner:
@@ -174,6 +141,8 @@ class EnhancedInterviewRunner:
                 interviewee_response.messages[-1]["content"],
                 "interviewee",
             )
+            
+            import pdb; pdb.set_trace()
 
             # Get evaluation
             evaluation = self.evaluator.evaluate_response(

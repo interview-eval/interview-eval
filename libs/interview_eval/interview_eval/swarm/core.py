@@ -55,6 +55,7 @@ class Swarm:
             "tools": tools or None,
             "tool_choice": agent.tool_choice,
             "stream": stream,
+            "max_tokens": 4096,
         }
 
         if tools:
@@ -254,7 +255,11 @@ class Swarm:
                 stream=stream,
                 debug=debug,
             )
-            message = completion.choices[0].message
+            try:
+                message = completion.choices[0].message
+            except Exception:
+                import pdb; pdb.set_trace()
+                raise Exception
             debug_print(debug, "Received completion:", message)
             message.sender = active_agent.name
             history.append(json.loads(message.model_dump_json()))  # to avoid OpenAI types (?)

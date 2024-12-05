@@ -5,6 +5,9 @@ session:
 
 evaluator:
   name: "Evaluator"
+  model: "gpt-4o"
+  client:
+    api_key: ${OPENAI_API_KEY}
   instructions: |
     You are an expert evaluator for technical interviews.
     Evaluate answers for correctness, completeness, and depth of understanding.
@@ -17,6 +20,9 @@ evaluator:
 
 questioner:
   name: "Questioner"
+  model: "gpt-4o"
+  client:
+    api_key: ${OPENAI_API_KEY}
   instructions: |
     You are an expert technical interviewer.
     Adapt questions based on candidate's previous responses.
@@ -36,6 +42,10 @@ questioner:
 
 interviewee:
   name: "Candidate"
+  model: "openai/gpt-4o-mini-2024-07-18"
+  client:
+    base_url: "https://openrouter.ai/api/v1"
+    api_key: ${OPENROUTER_API_KEY}
   instructions: |
     You are a software engineering candidate interviewing for a backend position.
     You have good knowledge of web development but might make occasional mistakes.

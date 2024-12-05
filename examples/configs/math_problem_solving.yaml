@@ -5,7 +5,7 @@ interview_type: base
 # Interviewer Configuration
 interviewer:
   name: "Teacher"
-  model: "gpt-4o"
+  model: "gpt-4o-mini"
   client:
     api_key: ${OPENAI_API_KEY}
   instructions: |
