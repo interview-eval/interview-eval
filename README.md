@@ -2,6 +2,27 @@
 
 An automated interview evaluation system that simulates technical interviews using AI agents. The system consists of an AI interviewer and interviewee, conducting structured conversations based on predefined rubrics and strategies.
 
+## Quick Test (12.05)
+
+- Intall requirements
+```
+"openai>=1.55.2",
+"python-dotenv>=1.0.1",
+"pyyaml>=6.0.2",
+"rich>=13.9.4",
+```
+
+- Setup API key in .env file
+  - Local models can be evaluated through VLLM serve
+```
+OPENAI_API_KEY=YOUR_OPENAI_API_KEY
+OPENROUTER_API_KEY=YOUR_OPENROUTER_API_KEY
+```
+
+```bash
+python libs/interview-eval/main.py --config examples/math_problem_solving.yaml
+```
+
 ## 📦 Installation
 
 ```bash
