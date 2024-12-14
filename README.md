@@ -10,6 +10,7 @@ An automated interview evaluation system that simulates technical interviews usi
 "python-dotenv>=1.0.1",
 "pyyaml>=6.0.2",
 "rich>=13.9.4",
+"click"
 ```
 
 - Setup API key in .env file
@@ -20,7 +21,7 @@ OPENROUTER_API_KEY=YOUR_OPENROUTER_API_KEY
 ```
 
 ```bash
-python libs/interview-eval/main.py --config examples/math_problem_solving.yaml
+python libs/interview_eval/main.py --config examples/configs/math_problem_solving.yaml
 ```
 
 ## 📦 Installation
