@@ -1,7 +1,9 @@
 # LLM-as-an-Interviewer
 This is the official github repository for [LLM-AS-AN-INTERVIEWER: Beyond Static Testing Through Dynamic LLM Evaluation](https://arxiv.org/abs/2412.10424).
 
-An automated interview evaluation system that simulates technical interviews using AI agents. The system consists of an AI interviewer and interviewee, conducting structured conversations based on predefined rubrics and strategies.
+LLM-as-an-Interviewer is an evaluation framework that assesses the capabilities of LLMs through an interview-style process. In this approach, the LLM acting as the interviewer evaluates other LLMs by providing feedback and asking follow-up questions, enabling a more comprehensive assessment of their capabilities.
+
+Our framework includes a flexible pipeline that can be easily adapted to various tasks by incorporating a customized evaluation rubric.
 
 ## Quick Test (12.05)
 - Git Clone
