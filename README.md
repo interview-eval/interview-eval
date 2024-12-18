@@ -165,7 +165,7 @@ decontaminated = batch_decontaminate(
 
 - Feedback & Editing Loop
   - Proceed to next question if the response is graded as `Good`
-  - 이전에 했던 feedback 주지 말기
+  - Do not provide feedback that has already been given before.
 
 - Followup Questions
   - Problem, Response, Feedback, Followup Question, Response, Feedback, Followup Question, ...
