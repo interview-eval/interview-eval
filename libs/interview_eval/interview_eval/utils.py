@@ -15,6 +15,7 @@ custom_theme = Theme(
     {
         "interviewer": "green",
         "interviewee": "blue",
+        "feedback agent": "magenta",
         "info": "cyan",
         "warning": "yellow",
         "error": "red",
@@ -63,5 +64,7 @@ def load_config(config_path: str) -> dict:
             env_value = os.getenv(var)
             if env_value:
                 content = content.replace(f"${{{var}}}", env_value)
+            else:
+                raise ValueError(f"Environment variable {var} not set")
 
     return yaml.safe_load(content)

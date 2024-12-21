@@ -103,12 +103,22 @@ class InterviewRunner:
         self.console = console
         self.questions_count = 0
         self.max_questions = config["session"].get("max_questions", 10)  # Default to 10 questions if not specified
-        self.max_retries = config["session"].get("max_retries", 2)  # Default to 2 retries if not specified
+        self.max_retries = config["session"].get("max_retries", 3)  # Default to 3 retries if not specified
+        self.interviewer_messages = []
+        self.interviewee_messages = []
+        self.feedbacks = []
         self.seed_question_used = False
 
     def display_message(self, agent_name: str, content: str):
         """Display a message with proper formatting."""
-        style = "interviewer" if agent_name == self.interviewer.name else "interviewee"
+
+        agent_name_to_style = {
+            self.interviewer.name.lower(): "interviewer",
+            self.interviewee.name.lower(): "interviewee",
+            "feedback agent": "feedback agent",
+        }
+
+        style = agent_name_to_style[agent_name.lower()]
         panel = Panel(
             content,
             title=f"[{style}]{agent_name}[/{style}]",
@@ -149,19 +159,50 @@ class InterviewRunner:
             task = progress.add_task("Processing response...", total=None)
             return self.client.run(agent=agent, messages=messages, context_variables=context)
 
+    def _get_response_raw(self, agent: Agent, messages: list, chat_params: dict):
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            console=self.console,
+            transient=True,
+        ) as progress:
+            task = progress.add_task("Processing response...", total=None)
+            full_params = {
+                "model": agent.model,
+                "messages": messages,
+            }
+            full_params.update(chat_params)
+            raw_response = agent.client.chat.completions.create(**full_params)
+            content = raw_response.choices[0].message.content
+            return Response(messages=[{"role": "assistant", "content": content}], agent=agent, context_variables={})
+
+    def add_message(self, speaker, content):
+        """Add messages to both conversation tracks based on who's speaking.
+
+        When interviewer speaks: they're the assistant, interviewee is the user
+        When interviewee speaks: they're the assistant, interviewer is the user
+        """
+        if speaker == self.interviewer:
+            # Interviewer is speaking (as assistant) to interviewee (as user)
+            self.interviewer_messages.extend([{"role": "assistant", "content": content}])
+            self.interviewee_messages.extend([{"role": "user", "content": content}])
+        else:
+            # Interviewee is speaking (as assistant) to interviewer (as user)
+            self.interviewer_messages.extend([{"role": "user", "content": content}])
+            self.interviewee_messages.extend([{"role": "assistant", "content": content}])
+
     # TODO: Refactor this method to make it more readable
     def run(self) -> Dict[str, Any]:
         """Run the interview and return results."""
         self.console.print("\n[info]Starting Interview Session...[/info]\n")
 
-        initial_message = self.config["session"]["initial_message"]
-        interviewer_messages = [{"role": "assistant", "content": initial_message}]
-        interviewee_messages = [{"role": "user", "content": initial_message}]
-        context = self.config["session"]["initial_context"]
-
+        initial_message = self.config["session"]["initial_message"]        
+        self.add_message(self.interviewer, initial_message)
         self.display_message(self.interviewer.name, initial_message)
 
-        response = self._get_response(self.interviewee, interviewee_messages, context)
+        context = self.config["session"]["initial_context"]
+
+        response = self._get_response(self.interviewee, self.interviewee_messages, context)
         self.display_message(response.agent.name, response.messages[-1]["content"])
 
         while not response.context_variables.get("interview_complete", False):
@@ -179,17 +220,7 @@ class InterviewRunner:
                     and self.interviewer.seed_question
                 ):
                     # Use the seed question for the first question
-                    interviewer_messages.extend(
-                        [
-                            {"role": "user", "content": previous_response_content},
-                        ]
-                    )
-                    interviewee_messages.extend(
-                        [
-                            {"role": "assistant", "content": previous_response_content},
-                        ]
-                    )
-
+                    self.add_message(self.interviewee, previous_response_content)
                     interviewer_response = Response(
                         messages=[{"role": "assistant", "content": self.interviewer.seed_question}],
                         agent=self.interviewer,
@@ -198,49 +229,33 @@ class InterviewRunner:
                     self.seed_question_used = True
                 else:
                     # Generate a question as usual
-                    interviewer_messages.extend(
-                        [
-                            {"role": "user", "content": previous_response_content},
-                        ]
-                    )
-                    interviewee_messages.extend(
-                        [
-                            {"role": "assistant", "content": previous_response_content},
-                        ]
-                    )
+                    self.add_message(self.interviewee, previous_response_content)
                     interviewer_response = self._get_response(
-                        next_agent, interviewer_messages, response.context_variables
+                        next_agent, self.interviewer_messages, response.context_variables
                     )
 
                 response = interviewer_response
             else:
                 # Next speaker is interviewee
-                interviewer_messages.extend(
-                    [
-                        {"role": "assistant", "content": previous_response_content},
-                    ]
-                )
-                interviewee_messages.extend(
-                    [
-                        {"role": "user", "content": previous_response_content},
-                    ]
-                )
-                response = self._get_response(next_agent, interviewee_messages, response.context_variables)
+                self.add_message(self.interviewer, previous_response_content)
+                response = self._get_response(next_agent, self.interviewee_messages, response.context_variables)
 
             self.display_message(response.agent.name, response.messages[-1]["content"])
 
-            if response.agent == self.interviewee:      
-                last_msg_content = "Question: " + interviewee_messages[-1]["content"] + "\nResponse: "+ response.messages[-1]["content"]
+            if response.agent == self.interviewee:
+                last_msg_content = "Question: " + self.interviewee_messages[-1]["content"] + "\nResponse: "+ response.messages[-1]["content"]
                 fmsg = [{"role": "user", "content": f"Provide a concise language critique in 2 sentences evaluating the response based the previous question. Provide rationale.\n{last_msg_content}"}]
-                temp_msg = self._get_response(self.interviewer, fmsg, {})
-                self.display_message("Feedback Agent", temp_msg.messages[-1]["content"])
+                temp_msg = self._get_response_raw(self.interviewer, fmsg, {})
+                feedback = temp_msg.messages[-1]["content"]
+                self.feedbacks.append(feedback)
+                self.display_message("Feedback Agent", feedback)
 
-            # 1. Check end conditions for the interview
+            # Check end conditions for the interview
             if response.agent == self.interviewee and self.questions_count >= self.max_questions:
                 final_message = "Maximum number of questions reached. Concluding interview."
                 self.console.print(f"\n[warning]{final_message}[/warning]")
 
-                interviewer_messages.extend(
+                self.interviewer_messages.extend(
                     [
                         {
                             "role": "assistant",
@@ -250,7 +265,7 @@ class InterviewRunner:
                     ]
                 )
 
-                response = self._get_response(self.interviewer, interviewer_messages, {"force_conclude": True})
+                response = self._get_response(self.interviewer, self.interviewer_messages, {"force_conclude": True})
                 self.display_message(response.agent.name, response.messages[-1]["content"])
                 break
 
