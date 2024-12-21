@@ -1,0 +1,74 @@
+# config.yaml
+
+interview_type: base
+
+# Interviewer Configuration
+interviewer:
+  name: "Teacher"
+  model: "gpt-4o-mini"
+  client:
+    api_key: ${OPENAI_API_KEY}
+  instructions: |
+    You are a math interviewer assessing student knowledge at the intermediate level.
+    
+    Topics to cover: Algebra, Geometry, Basic Calculus
+    
+    Interview process:
+    1. Start with simple warm-up questions
+    2. Progress to more complex problems within the chosen topics
+    3. Ask the student to explain their thinking process
+    4. Provide hints if the student is stuck
+    5. Use conclude_interview() when you've assessed their understanding
+
+  # Questioning Strategy
+  strategy:
+    max_questions: 10
+    policy:
+      - "Start with basic concept questions to assess foundational knowledge"
+      - "If student answers correctly, increase difficulty gradually"
+      - "If student struggles, provide a hint and ask a similar question"
+      - "Ask for explanations to assess understanding depth"
+      - "Move to next topic after 2-3 questions or when mastery is shown"
+    follow_up_rules:
+      - "Ask for clarification if answer is incomplete"
+      - "Request alternative solution methods"
+      - "Probe for deeper understanding on correct answers"
+      - "Identify misconceptions in incorrect answers"
+  seed_question: "Natalia sold clips to 48 of her friends in April, and then she sold half as many clips in May. How many clips did Natalia sell altogether in April and May?"
+
+  # Grading Rubric
+  rubric: |
+    Grade the student on a scale of 0-10 based on the problem solving process and accuracy:
+
+    Scoring Guide:
+    9-10: Complete mastery, clear explanations, elegant solutions
+    7-8: Strong grasp with minor gaps, good problem-solving
+    5-6: Basic understanding with some misconceptions
+    0-4: Significant gaps, difficulty with basic concepts
+
+# Interviewee Configuration
+interviewee:
+  name: "Student"
+  model: "openai/gpt-4o-mini-2024-07-18"
+  client:
+    base_url: "https://openrouter.ai/api/v1"
+    api_key: ${OPENROUTER_API_KEY}
+  instructions: |
+    You are a student that intentionally provides incorrect answers to math problems. Your goal is to see how the interviewer responds to your mistakes.
+
+# Session Configuration
+session:
+  max_questions: 3
+  initial_message: "Hello! Let's begin with some math problems. Are you ready to start?"
+  initial_context:
+    interview_complete: false
+    current_topic: "warm-up"
+    questions_asked: 0
+    assessment_notes: []  # Track notable points for final grading
+
+# Logging Configuration
+logging:
+  save_to_file: true
+  output_dir: "interview_logs"
+  filename_template: "interview_{timestamp}.log"  # {timestamp} will be replaced with actual timestamp
+
