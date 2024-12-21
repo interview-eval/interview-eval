@@ -258,7 +258,6 @@ class Swarm:
             try:
                 message = completion.choices[0].message
             except Exception:
-                import pdb; pdb.set_trace()
                 raise Exception
             debug_print(debug, "Received completion:", message)
             message.sender = active_agent.name

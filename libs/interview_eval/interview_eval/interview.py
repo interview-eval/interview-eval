@@ -1,3 +1,4 @@
+import json
 import logging
 
 # import dataclass
@@ -12,7 +13,6 @@ from rich.progress import Progress, SpinnerColumn, TextColumn
 
 from interview_eval.swarm import Agent, Result, Swarm
 from interview_eval.utils import get_json_prompt
-import json
 
 
 @dataclass
@@ -196,49 +196,52 @@ class InterviewRunner:
             # Interviewee is speaking (as assistant) to interviewer (as user)
             self.interviewer_messages.extend([{"role": "user", "content": content}])
             self.interviewee_messages.extend([{"role": "assistant", "content": content}])
-    
-    
+
     def call_feedback_agent(self, question, response):
-        last_msg_content = "Question: " + question + "\nResponse: "+ response
-            
+        last_msg_content = "Question: " + question + "\nResponse: " + response
+
         json_prompt = get_json_prompt(
             {
                 "feedback": "langauge critique string",
                 "correctness": "boolean indicating the correctness of the response",
             }
         )
-        full_prompt = f"Provide a concise language critique in 2 sentences evaluating the response based the previous question, along with a boolean value indicating the correctness of the response. \n{last_msg_content}\n" + json_prompt
+        full_prompt = (
+            f"Provide a concise language critique in 2 sentences evaluating the response based the previous question, along with a boolean value indicating the correctness of the response. \n{last_msg_content}\n"
+            + json_prompt
+        )
         fmsg = [{"role": "user", "content": full_prompt}]
 
         temp_msg = self._get_response_raw(self.interviewer, fmsg, {}, json=True)
         response_dict = json.loads(temp_msg.messages[-1]["content"])
         feedback = response_dict["feedback"]
         is_correct = response_dict["correctness"]
-        
+
         assert isinstance(feedback, str), "Generation Error in Feedback Agent: Feedback should be a string"
         assert is_correct in [
             True,
             False,
         ], "Generation Error in Feedback Agent: `is_correct` should be a boolean value"
         return feedback, is_correct
-    
-    
+
     def call_hint_agent(self, question, response, feedback):
-        last_msg_content = "Question: " + question + "\nResponse: "+ response + "\nFeedback: " + feedback
+        last_msg_content = "Question: " + question + "\nResponse: " + response + "\nFeedback: " + feedback
         hint_msg = [
-            {"role": "user", "content": f"Given the following, try to give a hint to the interviewee to help them answer the question correctly.\n{last_msg_content}"}
+            {
+                "role": "user",
+                "content": f"Given the following, try to give a hint to the interviewee to help them answer the question correctly.\n{last_msg_content}",
+            }
         ]
 
         response = self._get_response_raw(self.interviewer, hint_msg, {})
         return response.messages[-1]["content"]
-        
 
     # Note: Please follow the convention of adding the message to the conversation first and then displaying it
     def run(self) -> Dict[str, Any]:
         """Run the interview and return results."""
         self.console.print("\n[info]Starting Interview Session...[/info]\n")
 
-        initial_message = self.config["session"]["initial_message"]        
+        initial_message = self.config["session"]["initial_message"]
         self.add_message(self.interviewer, initial_message)
         self.display_message(self.interviewer.name, initial_message)
 
@@ -265,15 +268,13 @@ class InterviewRunner:
             self.seed_question_used = True
         else:
             # Generate a question as usual
-            interviewer_response = self._get_response(
-                self.interviewer, self.interviewer_messages, {}
-            )
+            interviewer_response = self._get_response(self.interviewer, self.interviewer_messages, {})
 
         response = interviewer_response
         self.add_message(self.interviewer, response.messages[-1]["content"])
         self.display_message(self.interviewer.name, response.messages[-1]["content"])
 
-        while self.questions_count <= self.max_questions:            
+        while self.questions_count <= self.max_questions:
             # 1. Get response from interviewee
             question = self.interviewer_messages[-1]["content"]
             response = self._get_response(self.interviewee, self.interviewee_messages, {}).messages[-1]["content"]
@@ -282,60 +283,59 @@ class InterviewRunner:
 
             # 2. Get feedback from feedback agent. Note that the message from feedback agent is not added to the conversation
             feedback, is_correct = self.call_feedback_agent(question, response)
-            
+
             self.feedbacks.append(feedback)
             self.display_message(
                 "Feedback Agent",
                 feedback + ("\n\nCorrectness: True" if is_correct else "\n\nCorrectness: False"),
             )
 
-
             # Retry the question `self.max_retries`` times if the response is incorrect
             if not is_correct:
                 # Retry the question, if max retries not reached
                 # Check if cur_retry is initialized and increment it
                 current_retry = 0
-                
+
                 while current_retry < self.max_retries and is_correct == False:
-                    self.console.print(f"\n[info]Retrying Question {self.questions_count}, Current number of retrials: {current_retry}")
-                    
+                    self.console.print(
+                        f"\n[info]Retrying Question {self.questions_count}, Current number of retrials: {current_retry}"
+                    )
+
                     hint = self.call_hint_agent(question, response, feedback)
                     self.add_message(self.interviewer, hint)
-                    self.display_message(
-                        self.interviewer.name, hint
-                    )
-                    
-                    response = self._get_response(self.interviewee, self.interviewee_messages, {}).messages[-1]["content"]
+                    self.display_message(self.interviewer.name, hint)
+
+                    response = self._get_response(self.interviewee, self.interviewee_messages, {}).messages[-1][
+                        "content"
+                    ]
                     self.add_message(self.interviewee, response)
                     self.display_message(self.interviewee.name, response)
-                    
+
                     feedback, is_correct = self.call_feedback_agent(question, response)
                     self.feedbacks.append(feedback)
                     self.display_message(
                         "Feedback Agent",
                         feedback + ("\n\nCorrectness: True" if is_correct else "\n\nCorrectness: False"),
                     )
-                
+
                 if is_correct == False:
                     # If max retries reached, get next question
                     self.current_retry = None
                     self.questions_count += 1
 
-                    move_on_after_fails = "I think this question is too difficult for you. Let's move on to the next question."
-                    self.add_message(self.interviewer, move_on_after_fails)
-                    self.display_message(
-                        self.interviewer.name, move_on_after_fails
+                    move_on_after_fails = (
+                        "I think this question is too difficult for you. Let's move on to the next question."
                     )
+                    self.add_message(self.interviewer, move_on_after_fails)
+                    self.display_message(self.interviewer.name, move_on_after_fails)
 
             # Reset the interviewee messages when moving on to the next question
             self.interviewee_messages = []
-            
+
             self.questions_count += 1
             if self.questions_count <= self.max_questions:
                 self.console.print(f"\n[info]Question {self.questions_count}")
-                response = self._get_response(
-                    self.interviewer, self.interviewer_messages, {}
-                )
+                response = self._get_response(self.interviewer, self.interviewer_messages, {})
                 self.add_message(self.interviewer, response.messages[-1]["content"])
                 self.display_message(self.interviewer.name, response.messages[-1]["content"])
 

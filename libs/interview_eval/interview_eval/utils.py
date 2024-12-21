@@ -47,7 +47,7 @@ def setup_logging(config: dict, verbose: bool) -> logging.Logger:
             file_handler.setLevel(logging.INFO)
             logger.addHandler(file_handler)
     except KeyError:
-        return None   
+        return None
 
     return logger
 
@@ -85,4 +85,3 @@ if __name__ == "__main__":
     # Test the functions
     json_prompt = get_json_prompt({"name": "Your name", "age": "Your age"})
     print(json_prompt)
-    
