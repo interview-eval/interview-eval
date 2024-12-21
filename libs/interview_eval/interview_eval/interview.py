@@ -159,7 +159,7 @@ class InterviewRunner:
             task = progress.add_task("Processing response...", total=None)
             return self.client.run(agent=agent, messages=messages, context_variables=context)
 
-    def _get_response_raw(self, agent: Agent, messages: list, chat_params: dict):
+    def _get_response_raw(self, agent: Agent, messages: list, chat_params: dict, json: bool = False) -> Response:
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
@@ -171,6 +171,10 @@ class InterviewRunner:
                 "model": agent.model,
                 "messages": messages,
             }
+
+            if json:
+                full_params["response_format"] = {"type": "json_object"}
+
             full_params.update(chat_params)
             raw_response = agent.client.chat.completions.create(**full_params)
             content = raw_response.choices[0].message.content
@@ -204,6 +208,8 @@ class InterviewRunner:
 
         response = self._get_response(self.interviewee, self.interviewee_messages, context)
         self.display_message(response.agent.name, response.messages[-1]["content"])
+        
+        
 
         while not response.context_variables.get("interview_complete", False):
             next_agent = self.interviewer if response.agent == self.interviewee else self.interviewee

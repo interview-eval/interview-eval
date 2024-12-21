@@ -68,3 +68,21 @@ def load_config(config_path: str) -> dict:
                 raise ValueError(f"Environment variable {var} not set")
 
     return yaml.safe_load(content)
+
+
+def get_json_prompt(key_description_dict: dict):
+    """Get JSON prompt from key-description dictionary."""
+    instruction = "Please output the information in the following json format:\n\n"
+    prompt = []
+
+    for key, description in key_description_dict.items():
+        prompt.append(f'  "{key}": "{description}",\n')
+
+    return instruction + "{\n" + "".join(prompt) + "}\n"
+
+
+if __name__ == "__main__":
+    # Test the functions
+    json_prompt = get_json_prompt({"name": "Your name", "age": "Your age"})
+    print(json_prompt)
+    
