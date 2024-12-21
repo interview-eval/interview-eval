@@ -1,6 +1,31 @@
-# interview-eval
+# LLM-as-an-Interviewer
+This is the official GitHub repository for [LLM-AS-AN-INTERVIEWER: Beyond Static Testing Through Dynamic LLM Evaluation](https://arxiv.org/abs/2412.10424).
 
-An automated interview evaluation system that simulates technical interviews using AI agents. The system consists of an AI interviewer and interviewee, conducting structured conversations based on predefined rubrics and strategies.
+LLM-as-an-Interviewer is an evaluation framework that assesses the capabilities of LLMs through an interview-style process. In this approach, the LLM acting as the interviewer evaluates other LLMs by providing feedback and asking follow-up questions, enabling a more comprehensive assessment of their capabilities.
+
+Our framework includes a flexible pipeline that can be easily adapted to various tasks by incorporating a customized evaluation rubric.
+
+## Quick Test (12.05)
+- Git Clone
+- Install requirements
+```
+"openai>=1.55.2",
+"python-dotenv>=1.0.1",
+"pyyaml>=6.0.2",
+"rich>=13.9.4",
+"click"
+```
+
+- Setup API key in .env file
+  - Local models can be evaluated through VLLM serve
+```
+OPENAI_API_KEY=YOUR_OPENAI_API_KEY
+OPENROUTER_API_KEY=YOUR_OPENROUTER_API_KEY
+```
+
+```bash
+python libs/interview_eval/main.py --config examples/configs/math_problem_solving.yaml
+```
 
 ## 📦 Installation
 
@@ -140,7 +165,7 @@ decontaminated = batch_decontaminate(
 
 - Feedback & Editing Loop
   - Proceed to next question if the response is graded as `Good`
-  - 이전에 했던 feedback 주지 말기
+  - Do not provide feedback that has already been given before.
 
 - Followup Questions
   - Problem, Response, Feedback, Followup Question, Response, Feedback, Followup Question, ...

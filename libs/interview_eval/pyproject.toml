@@ -1,12 +1,12 @@
 [project]
 name = "interview-eval"
-version = "0.0.1"
+version = "0.1.2"
 description = ""
 readme = "README.md"
 authors = [
     { name = "Juyoung Suk", email = "juyoung@kaist.ac.kr" },
 ]
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 dependencies = [
     "black>=24.10.0",
     "click>=8.1.7",
