@@ -199,7 +199,14 @@ class InterviewRunner:
             self.interviewee_messages.extend([{"role": "assistant", "content": content}])
 
     def call_feedback_agent(self, question, response):
-        last_msg_content = "Question: " + question + "\nResponse: " + response
+
+        if question == self.interviewer.seed_question and self.interviewer.interviewer_config["seed_question_answer"] is not None:
+            last_msg_content = "Question: " + question + "\nReference Answer: " + self.interviewer.interviewer_config["seed_question_answer"] +  "\nResponse: " + response
+        else:
+            last_msg_content = "Question: " + question + "\nResponse: " + response
+            
+        
+        conditional_ref_prompt = "" if self.interviewer.interviewer_config["seed_question_answer"] is None else f" and reference answer to the question"
 
         json_prompt = get_json_prompt(
             {
@@ -208,7 +215,7 @@ class InterviewRunner:
             }
         )
         full_prompt = (
-            f"Given a grading rubric, provide a concise language critique in 2 sentences evaluating the response based the previous question, along with a boolean value indicating the correctness of the response.\n\n### Score Rubric:\n{self.interviewer.interviewer_config['rubric']}\n\n### Response:\n{last_msg_content}\n"
+            f"Given a grading rubric, provide a concise language critique in 2 sentences evaluating the response based the previous question{conditional_ref_prompt}, along with a boolean value indicating the correctness of the response.\n\n### Score Rubric:\n{self.interviewer.interviewer_config['rubric']}\n\n### Response:\n{last_msg_content}\n"
             + json_prompt
         )
         fmsg = [{"role": "user", "content": full_prompt}]
@@ -226,22 +233,22 @@ class InterviewRunner:
         return feedback, is_correct
 
     def call_hint_agent(self, question, response, feedback):
-        
+
         chat_history_str = "### Previous Chat History\n\n"
         for message in self.interviewee_messages:
             if message["role"] == "assistant":
                 chat_history_str += f"{self.interviewee.name}: {message['content']}\n"
             else:
                 chat_history_str += f"You: {message['content']}\n"
-            
+
         chat_history_str += "\n"
-        
+
         last_msg_content = chat_history_str + "Question: " + question + "\nResponse: " + response + "\nFeedback: " + feedback
-        
+
         hint_msg = [
             {
                 "role": "user",
-                "content": f"Given the following, you have to give a hint to the interviewee to help them answer the question correctly.\n{last_msg_content}",
+                "content": f"Given the following, you have to give a hint to the interviewee to help them answer the question correctly. If the {self.interviewee.name} makes repeated mistakes, give more hint to fix the mistake.\n{last_msg_content}",
             }
         ]
 

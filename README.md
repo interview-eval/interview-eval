@@ -17,7 +17,7 @@ Our framework includes a flexible pipeline that can be easily adapted to various
 ```
 
 - Setup API key in .env file
-  - Local models can be evaluated through VLLM serve
+  - Local models can be evaluated through [VLLM serve](https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html?ref=blog.mozilla.ai).
 ```
 OPENAI_API_KEY=YOUR_OPENAI_API_KEY
 OPENROUTER_API_KEY=YOUR_OPENROUTER_API_KEY
