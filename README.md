@@ -5,7 +5,7 @@ LLM-as-an-Interviewer is an evaluation framework that assesses the capabilities 
 
 Our framework includes a flexible pipeline that can be easily adapted to various tasks by incorporating a customized evaluation rubric.
 
-## Quick Test (12.05)
+## 🚀 Quick Start
 - Git Clone
 - Install requirements
 ```
@@ -17,12 +17,16 @@ Our framework includes a flexible pipeline that can be easily adapted to various
 ```
 
 - Setup API key in .env file
-  - Local models can be evaluated through [VLLM serve](https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html?ref=blog.mozilla.ai).
 ```
 OPENAI_API_KEY=YOUR_OPENAI_API_KEY
 OPENROUTER_API_KEY=YOUR_OPENROUTER_API_KEY
 ```
 
+
+- ***Note:*** To test local models, you can use [vLLM serve](https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html?ref=blog.mozilla.ai) to launch the OpenAI compatible server.
+
+
+- Run the following command to start the interview
 ```bash
 python libs/interview_eval/main.py --config examples/configs/math_problem_solving.yaml
 ```
@@ -42,7 +46,9 @@ pip install interview-eval
 - Progress tracking and maximum question limits
 - Customizable OpenAI client configuration
 
-## 🚀 Quick Start
+## Basic Usage
+
+- All you need is the below code snippet and your customized `config.yaml` file!
 
 ```python
 from interview_eval import InterviewRunner, Interviewer, Interviewee
@@ -155,31 +161,3 @@ decontaminated = batch_decontaminate(
     model="gpt-4"
 )
 ```
-
-
-### Requirements & TODOs
-
-- Modifying problem ✔️
-  - Python function to modify the problem `modify_problem`
-  - Supported strategies: `Unclarifying`, `Paraphrasing`, and `Modifying` (given seed question, create a new question)
-
-- Feedback & Editing Loop
-  - Proceed to next question if the response is graded as `Good`
-  - Do not provide feedback that has already been given before.
-
-- Followup Questions
-  - Problem, Response, Feedback, Followup Question, Response, Feedback, Followup Question, ...
-
-- Report Card
-  - Per seed questions pool
-  - Include information about the student's performance on each question that received different scores
-
-
-- [ ] More strict loading of config.yaml (e.g. check if all required fields are present)
-- [X] Add documentation for the code
-- [ ] Support interview_type: "base", "adaptive"
-- [ ] Fix the organization for cli support
-- [ ] Add tests
-- [ ] Hide logging inside the Runner
-- [ ] Add support for seed questions
-- [ ] Release to PyPI
