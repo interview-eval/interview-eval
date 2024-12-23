@@ -47,6 +47,7 @@ class Interviewer(Agent):
         )
 
         self.seed_question = interviewer_config.get("seed_question", "")
+        self.interviewer_config = interviewer_config
 
     def conclude_interview(self, score: int, comments: str) -> Result:
         """End interview with final assessment.
@@ -207,7 +208,7 @@ class InterviewRunner:
             }
         )
         full_prompt = (
-            f"Provide a concise language critique in 2 sentences evaluating the response based the previous question, along with a boolean value indicating the correctness of the response. \n{last_msg_content}\n"
+            f"Given a grading rubric, provide a concise language critique in 2 sentences evaluating the response based the previous question, along with a boolean value indicating the correctness of the response.\n\n### Score Rubric:\n{self.interviewer.interviewer_config['rubric']}\n\n### Response:\n{last_msg_content}\n"
             + json_prompt
         )
         fmsg = [{"role": "user", "content": full_prompt}]
@@ -225,11 +226,22 @@ class InterviewRunner:
         return feedback, is_correct
 
     def call_hint_agent(self, question, response, feedback):
-        last_msg_content = "Question: " + question + "\nResponse: " + response + "\nFeedback: " + feedback
+        
+        chat_history_str = "### Previous Chat History\n\n"
+        for message in self.interviewee_messages:
+            if message["role"] == "assistant":
+                chat_history_str += f"{self.interviewee.name}: {message['content']}\n"
+            else:
+                chat_history_str += f"You: {message['content']}\n"
+            
+        chat_history_str += "\n"
+        
+        last_msg_content = chat_history_str + "Question: " + question + "\nResponse: " + response + "\nFeedback: " + feedback
+        
         hint_msg = [
             {
                 "role": "user",
-                "content": f"Given the following, try to give a hint to the interviewee to help them answer the question correctly.\n{last_msg_content}",
+                "content": f"Given the following, you have to give a hint to the interviewee to help them answer the question correctly.\n{last_msg_content}",
             }
         ]
 
