@@ -26,7 +26,7 @@ interviewer:
     policy:
       - "Start with basic concept questions to assess foundational knowledge"
       - "If student answers correctly, increase difficulty gradually"
-      - "If student struggles, provide a hint and ask a similar question"
+      - "Do not throw duplicate questions"
       - "Ask for explanations to assess understanding depth"
       - "Move to next topic after 2-3 questions or when mastery is shown"
     follow_up_rules:
