@@ -1,6 +1,6 @@
 import json
 import logging
-
+import pandas as pd
 # import dataclass
 from dataclasses import dataclass
 from typing import Any, Dict, Optional
@@ -36,17 +36,17 @@ class Interviewer(Agent):
         instructions = (
             interviewer_config["instructions"]
             + f"\nRubric:\n{interviewer_config['rubric']}\n"
-            + f"\nStrategy:\n{yaml.dump(interviewer_config['strategy'], default_flow_style=False)}"
         )
-
+        strategy = f"\nStrategy:\n{yaml.dump(interviewer_config['strategy'], default_flow_style=False)}"
         super().__init__(
             name=name,
             instructions=instructions,
             functions=[self.conclude_interview],
             client=client,
         )
-
+        self.strategy = strategy
         self.seed_question = interviewer_config.get("seed_question", "")
+        self.seed_question_answer = interviewer_config.get("seed_question_answer", "")
         self.interviewer_config = interviewer_config
 
     def conclude_interview(self, score: int, comments: str) -> Result:
@@ -88,6 +88,49 @@ class Interviewee(Agent):
         instructions = interviewee_config["instructions"]
         super().__init__(name=name, instructions=instructions, client=client)
 
+class InterviewReportManager:
+    def __init__(self):
+        # Initialize the DataFrame with the desired structure
+        self.interview_data = pd.DataFrame(columns=["interview_id", "question"])
+        self.current_interview_id = None
+
+    def start_new_interview(self):
+        # Determine the next interview_id
+        if not self.interview_data.empty:
+            self.current_interview_id = self.interview_data["interview_id"].max() + 1
+        else:
+            self.current_interview_id = 1
+
+    def log_attempt(self, question: str, retrial: int, is_correct: bool):
+        # Check if the question already exists in the DataFrame
+        if question not in self.interview_data["question"].values:
+            # Add a new row for the question
+            new_row = {"interview_id": self.current_interview_id, "question": question}
+            self.interview_data = pd.concat([self.interview_data, pd.DataFrame([new_row])], ignore_index=True)
+
+        # Ensure the retrial column exists, create it dynamically if needed
+        column_name = f"retrial_{retrial}"
+        if column_name not in self.interview_data.columns:
+            self.interview_data[column_name] = None
+
+        # Update the appropriate retrial column
+        self.interview_data.loc[
+            (self.interview_data["question"] == question) &
+            (self.interview_data["interview_id"] == self.current_interview_id),
+            column_name
+        ] = is_correct
+
+    def get_interview_data(self):
+        # Return the logged data for analysis or export
+        return self.interview_data
+
+    def save_to_csv(self, filename: str):
+        # Save the DataFrame to a CSV file
+        self.interview_data.to_csv(filename, index=False)
+
+    def load_from_csv(self, filename: str):
+        # Load the DataFrame from a CSV file
+        self.interview_data = pd.read_csv(filename)
 
 class InterviewRunner:
     def __init__(
@@ -97,6 +140,7 @@ class InterviewRunner:
         config: dict,
         logger: logging.Logger,
         console: Console,
+        report_manager: InterviewReportManager
     ):
         self.client = Swarm()
         self.interviewer = interviewer
@@ -107,11 +151,13 @@ class InterviewRunner:
         self.questions_count = 0
         self.max_questions = config["session"].get("max_questions", 10)  # Default to 10 questions if not specified
         self.max_retries = config["session"].get("max_retries", 3)  # Default to 3 retries if not specified
+        self.hint_prompt_template = config["interviewer"].get("hint_prompt_template","Given the following, you have to give a hint to the interviewee to help them answer the question correctly. \nIf the {interviewee_name} makes repeated mistakes, give more hints to fix the mistake.\n") 
         self.interviewer_messages = []
         self.interviewee_messages = []
         self.feedbacks = []
+        self.questions = []
         self.seed_question_used = False
-
+        self.report_manager = report_manager
     def display_message(self, agent_name: str, content: str):
         """Display a message with proper formatting."""
 
@@ -199,14 +245,14 @@ class InterviewRunner:
             self.interviewee_messages.extend([{"role": "assistant", "content": content}])
 
     def call_feedback_agent(self, question, response):
-
-        if question == self.interviewer.seed_question and self.interviewer.interviewer_config.get("seed_question_answer") is not None:
-            last_msg_content = "Question: " + question + "\nReference Answer: " + self.interviewer.interviewer_config.get("seed_question_answer") +  "\nResponse: " + response
+        if question == self.interviewer.seed_question and self.interviewer.seed_question_answer is not None:
+            
+            last_msg_content = "Question: " + question + "\nReference Answer: " + self.interviewer.seed_question_answer +  "\nResponse: " + response
         else:
             last_msg_content = "Question: " + question + "\nResponse: " + response
             
         
-        conditional_ref_prompt = "" if self.interviewer.interviewer_config.get("seed_question_answer") is None else f" and reference answer to the question"
+        conditional_ref_prompt = "" if self.interviewer.seed_question_answer is None else f" and reference answer to the question"
 
         json_prompt = get_json_prompt(
             {
@@ -248,11 +294,43 @@ class InterviewRunner:
         hint_msg = [
             {
                 "role": "user",
-                "content": f"Given the following, you have to give a hint to the interviewee to help them answer the question correctly. If the {self.interviewee.name} makes repeated mistakes, give more hint to fix the mistake.\n{last_msg_content}",
+                "content": self.hint_prompt_template.format(
+                    interviewee_name=self.interviewee.name)+last_msg_content
+                ,
             }
         ]
 
         response = self._get_response_raw(self.interviewer, hint_msg, {})
+        return response.messages[-1]["content"]
+
+    def call_question_agent(self, question, response):
+
+        chat_history_str = "### Previous Chat History\n\n"
+        for message in self.interviewer_messages:
+            if message["role"] == "user":
+                chat_history_str += f"{self.interviewee.name}: {message['content']}\n"
+            else:
+                chat_history_str += f"You: {message['content']}\n"
+
+        chat_history_str += "\n"
+        if self.interviewer.seed_question_answer is not None:
+            last_msg_content = chat_history_str + "\nReference Solution" + self.interviewer.seed_question_answer
+        else:
+            last_msg_content = chat_history_str
+        import pdb;pdb.set_trace()
+        followup_prompt = (
+            "Given the following, you have to generate a followup question based on the following instruction, and the previous log. Also, refer to the reference solution of the original question. " 
+            + f"Questioning instruction: {self.interviewer.strategy}\nPrevious Log: {last_msg_content}"
+        )
+
+        question_msg = [
+            {
+                "role": "user",
+                "content": followup_prompt,
+            }
+        ]
+        import pdb;pdb.set_trace()
+        response = self._get_response(self.interviewer, question_msg, {})
         return response.messages[-1]["content"]
 
     # Note: Please follow the convention of adding the message to the conversation first and then displaying it
@@ -285,6 +363,7 @@ class InterviewRunner:
                 context_variables={},
             )
             self.seed_question_used = True
+            self.questions.append(self.interviewer.seed_question)
         else:
             # Generate a question as usual
             interviewer_response = self._get_response(self.interviewer, self.interviewer_messages, {})
@@ -292,7 +371,7 @@ class InterviewRunner:
         response = interviewer_response
         self.add_message(self.interviewer, response.messages[-1]["content"])
         self.display_message(self.interviewer.name, response.messages[-1]["content"])
-
+        
         while self.questions_count <= self.max_questions:
             # 1. Get response from interviewee
             question = self.interviewer_messages[-1]["content"]
@@ -302,7 +381,7 @@ class InterviewRunner:
 
             # 2. Get feedback from feedback agent. Note that the message from feedback agent is not added to the conversation
             feedback, is_correct = self.call_feedback_agent(question, response)
-
+            self.report_manager.log_attempt(question, 0, is_correct)
             self.feedbacks.append(feedback)
             self.display_message(
                 "Feedback Agent",
@@ -331,6 +410,7 @@ class InterviewRunner:
                     self.display_message(self.interviewee.name, response)
 
                     feedback, is_correct = self.call_feedback_agent(question, response)
+                    self.report_manager.log_attempt(question, current_retry+1, is_correct)
                     self.feedbacks.append(feedback)
                     self.display_message(
                         "Feedback Agent",
@@ -352,9 +432,10 @@ class InterviewRunner:
             self.questions_count += 1
             if self.questions_count <= self.max_questions:
                 self.console.print(f"\n[info]Question {self.questions_count}")
-                response = self._get_response(self.interviewer, self.interviewer_messages, {})
-                self.add_message(self.interviewer, response.messages[-1]["content"])
-                self.display_message(self.interviewer.name, response.messages[-1]["content"])
+                response = self.call_question_agent(self.interviewer, self.interviewer_messages)
+                self.questions.append(response)
+                self.add_message(self.interviewer, response)
+                self.display_message(self.interviewer.name, response)
 
             # 4. Check end conditions for the interview
             if self.questions_count > self.max_questions:
@@ -373,3 +454,4 @@ class InterviewRunner:
 
         self.display_results(results)
         return results
+
