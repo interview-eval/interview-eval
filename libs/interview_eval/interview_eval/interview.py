@@ -200,13 +200,13 @@ class InterviewRunner:
 
     def call_feedback_agent(self, question, response):
 
-        if question == self.interviewer.seed_question and self.interviewer.interviewer_config["seed_question_answer"] is not None:
-            last_msg_content = "Question: " + question + "\nReference Answer: " + self.interviewer.interviewer_config["seed_question_answer"] +  "\nResponse: " + response
+        if question == self.interviewer.seed_question and self.interviewer.interviewer_config.get("seed_question_answer") is not None:
+            last_msg_content = "Question: " + question + "\nReference Answer: " + self.interviewer.interviewer_config.get("seed_question_answer") +  "\nResponse: " + response
         else:
             last_msg_content = "Question: " + question + "\nResponse: " + response
             
         
-        conditional_ref_prompt = "" if self.interviewer.interviewer_config["seed_question_answer"] is None else f" and reference answer to the question"
+        conditional_ref_prompt = "" if self.interviewer.interviewer_config.get("seed_question_answer") is None else f" and reference answer to the question"
 
         json_prompt = get_json_prompt(
             {
@@ -336,12 +336,10 @@ class InterviewRunner:
                         "Feedback Agent",
                         feedback + ("\n\nCorrectness: True" if is_correct else "\n\nCorrectness: False"),
                     )
-
+                    current_retry += 1
                 if is_correct == False:
                     # If max retries reached, get next question
                     self.current_retry = None
-                    self.questions_count += 1
-
                     move_on_after_fails = (
                         "I think this question is too difficult for you. Let's move on to the next question."
                     )
