@@ -33,16 +33,18 @@ def main(config: str, verbose: bool):
 
     try:
         config_data = load_config(config)
-        logger = setup_logging(config_data, verbose)
+        logger, _ = setup_logging(config_data, verbose)
 
-        interviewer = Interviewer(config=config_data, name="Teacher")
+        interviewer = Interviewer(config=config_data, name="Interviewer")
         student = Interviewee(config=config_data, name="Student")
 
-        interview = InterviewRunner(interviewer, student, config_data, logger, console)
+        interview = InterviewRunner(
+            interviewer, student, config_data, logger, console)
         interview.run()
 
     except KeyboardInterrupt:
-        console.print("\n[warning]Interview session interrupted by user[/warning]")
+        console.print(
+            "\n[warning]Interview session interrupted by user[/warning]")
     except Exception as e:
         console.print(f"\n[error]Error: {str(e)}[/error]")
         raise

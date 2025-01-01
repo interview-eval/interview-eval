@@ -41,15 +41,17 @@ def setup_logging(config: dict, verbose: bool) -> logging.Logger:
             output_dir.mkdir(parents=True, exist_ok=True)
 
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = config["logging"]["filename_template"].format(timestamp=timestamp)
+            filename = config["logging"]["filename_template"].format(
+                timestamp=timestamp)
             file_handler = logging.FileHandler(output_dir / filename)
             file_handler.setFormatter(formatter)
             file_handler.setLevel(logging.INFO)
+            log_file_path = file_handler.baseFilename
             logger.addHandler(file_handler)
     except KeyError:
-        return None
+        return None, None
 
-    return logger
+    return logger, log_file_path
 
 
 def load_config(config_path: str) -> dict:
