@@ -65,6 +65,19 @@ pip install interview-eval
 - Progress tracking and maximum question limits
 - Customizable OpenAI client configuration
 
+## 🖥️ Display Example
+
+- The interviewer and interviewee engage in a sequential conversation.  
+- The evaluation of the interviewee’s responses is also displayed (feedback is not disclosed to the interviewee).
+
+### Process:
+1. The first question is the **Seed Question** (`question1`).
+2. Follow-up questions (`question2`, ...) are provided thereafter.
+
+### Example Image:
+![Terminal Display Example](https://github.com/interview-eval/interview-eval/blob/main/assets/display_ex.png)
+
+
 ## 🛠️ Basic Usage
 
 - All you need is the below code snippet and your customized `config.yaml` file!
