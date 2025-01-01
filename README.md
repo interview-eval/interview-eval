@@ -69,7 +69,7 @@ pip install interview-eval
 ## 🖥️ Working Process
 
 - The interviewer and interviewee engage in a sequential conversation.  
-- The evaluation of the interviewee’s responses is also displayed (feedback is not disclosed to the interviewee).
+- The evaluation of the interviewee’s responses(as a feedback agent) is also displayed (feedback is not disclosed to the interviewee).
 
 ### Interview Process:
 1. The first question is the **Seed Question** (`question1`).
