@@ -111,7 +111,7 @@ class InterviewReportManager:
         self.current_interview_id = None
         self.config = config
 
-    def start_new_interview(self, log_file_path):
+    def start_interview(self, log_file_path):
         # Determine the next interview_id
         if not self.interview_data.empty:
             self.current_interview_id = self.interview_data["interview_id"].max(
@@ -376,6 +376,7 @@ class InterviewRunner:
         interviewee: Agent,
         config: dict,
         logger: logging.Logger,
+        log_file_path: str,
         console: Console,
         report_manager: InterviewReportManager
     ):
@@ -384,6 +385,7 @@ class InterviewRunner:
         self.interviewee = interviewee
         self.config = config
         self.logger = logger
+        self.log_file_path = log_file_path
         self.console = console
         self.questions_count = 0
         self.max_questions = config["session"].get(
@@ -592,7 +594,7 @@ class InterviewRunner:
     def run(self) -> Dict[str, Any]:
         """Run the interview and return results."""
         self.console.print("\n[info]Starting Interview Session...[/info]\n")
-
+        self.report_manager.start_interview(self.log_file_path)
         initial_message = self.config["session"]["initial_message"]
         self.add_message(self.interviewer, initial_message)
         self.display_message(self.interviewer.name, initial_message)
@@ -607,7 +609,7 @@ class InterviewRunner:
         # Start the interview loop
         self.questions_count += 1
         self.console.print(f"\n[info]Question {self.questions_count}[/info]")
-
+        
         if (
             not self.seed_question_used
             and hasattr(self.interviewer, "seed_question")
