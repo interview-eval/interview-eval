@@ -135,6 +135,7 @@ Refer to the following examples for creating your own configuration:
 ## 🔑 Guideline for Customizing the YAML File
 
 This guide explains how to customize the YAML file based on your needs to create and configure an effective interview session between an interviewer and an interviewee.
+
     - [Interview Type](#1-interview-type)
     - [Interviewer Configuration](#2-interviewer-configuration)
         - [Basic Settings](#basic-settings)
