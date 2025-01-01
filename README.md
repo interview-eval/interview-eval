@@ -21,7 +21,7 @@ Our framework includes a flexible pipeline that can be easily adapted to various
 5. [⚙️ Configuration](#️-configuration)
     - [📄 Example Configurations](#-example-configurations)
 6. [🔑 Guideline for Customizing the YAML File](#-guideline-for-customizing-the-yaml-file)
-7. [🔄 Question Decontamination](#question-decontamination)
+7. [🔄 Question Decontamination](#-question-decontamination)
 8. [Citation](#Citation)
 
 ## 🚀 Quick Start
