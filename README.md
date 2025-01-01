@@ -21,7 +21,7 @@ Our framework includes a flexible pipeline that can be easily adapted to various
 5. [⚙️ Configuration](#️-configuration)
     - [📄 Example Configurations](#-example-configurations)
 6. [🔑 Guideline for Customizing the YAML File](#-guideline-for-customizing-the-yaml-file)
-7. [Question Decontamination](#question-decontamination)
+7. [🔄 Question Decontamination](#question-decontamination)
 8. [Citation](#Citation)
 
 ## 🚀 Quick Start
@@ -327,7 +327,7 @@ report:
 - **Test Configuration:** Validate settings in a test environment to ensure smooth performance.
 - **Dynamic Variables:** Leverage placeholders (e.g., `${OPENAI_API_KEY}`, `{timestamp}`) for flexibility.
 
-## Question Decontamination
+## 🔄 Question Decontamination
 
 For users conducting benchmark-based interview (like GSM8K, MMLU, etc.), `interview-eval` provides functions to prevent test set contamination through three transformation strategies:
 
