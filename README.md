@@ -1,5 +1,5 @@
 # LLM-as-an-Interviewer
-This is the official GitHub repository for [LLM-AS-AN-INTERVIEWER: Beyond Static Testing Through Dynamic LLM Evaluation](https://arxiv.org/abs/2412.10424).
+This is the official GitHub repository for [LLM-as-an-Interviewer: Beyond Static Testing Through Dynamic LLM Evaluation](https://arxiv.org/abs/2412.10424).
 
 LLM-as-an-Interviewer is an evaluation framework that assesses the capabilities of LLMs through an interview-style process. In this approach, the LLM acting as the interviewer evaluates other LLMs by providing feedback and asking follow-up questions, enabling a more comprehensive assessment of their capabilities.
 
@@ -51,7 +51,7 @@ pip install interview-eval
 - All you need is the below code snippet and your customized `config.yaml` file!
 
 ```python
-from interview_eval import InterviewRunner, Interviewer, Interviewee
+from interview_eval import InterviewRunner, Interviewer, Interviewee, InterviewReportManager
 from interview_eval.utils import console, load_config, setup_logging
 import logging
 import yaml
@@ -60,14 +60,14 @@ import yaml
 config = load_config("config.yaml")
 
 # Setup logging and console
-logger = setup_logging("interview.log", verbose=True)
+logger, log_file_path = setup_logging(config_data, verbose)
 
 # Initialize agents
-interviewer = Interviewer(config)
-interviewee = Interviewee(config)
-
+interviewer = Interviewer(config=config_data, name="Interviewer")
+interviewee = Interviewee(config=config_data, name="Student")
+report_manager = InterviewReportManager(config=config_data)
 # Create and run interview
-runner = InterviewRunner(interviewer, interviewee, config, logger, console)
+runner = InterviewRunner(interviewer, student, config_data, logger, log_file_path, console, report_manager)
 results = runner.run()
 ```
 
@@ -96,6 +96,165 @@ session:
   max_retries: 2
   initial_context: {}
 ```
+
+## **Guideline for Customizing the YAML File**
+
+This guide explains how to customize the YAML file based on your needs to create and configure an effective interview session between an interviewer and an interviewee.
+
+---
+
+### **1. Interview Type**
+Define the type of interview:
+```yaml
+interview_type: <type>
+```
+- Example: `base`, `advanced`, or any custom type.
+
+---
+
+### **2. Interviewer Configuration**
+The `interviewer` section customizes the behavior and attributes of the interviewer.
+
+#### **Basic Settings**
+```yaml
+interviewer:
+  name: "<Interviewer Name>"
+  model: "<Interviewer AI Model>"
+  client:
+    api_key: ${<API_KEY_VARIABLE>}
+```
+- **`name`**: Provide a name for the interviewer (e.g., "Teacher").
+- **`model`**: Specify the AI model to use (e.g., `gpt-4o-mini`).
+- **`api_key`**: Add the API key environment variable.
+
+#### **Instructions**
+Define the behavior and goals of the interviewer:
+```yaml
+  instructions: |
+    <Interviewer instructions here>
+```
+- Example: "You are a science interviewer assessing high school knowledge. Topics to cover: Biology, Physics."
+
+#### **Hint Strategy**
+Customize how the interviewer provides hints:
+```yaml
+  hint_prompt_template: |
+    "<Hint strategy description>"
+```
+- Example: "Provide hints to help solve the problem without directly giving away the answer."
+
+#### **Questioning Strategy For Follow-Up Questions**
+Define the approach to questioning:
+```yaml
+  strategy:
+    max_questions: <Number>
+    policy:
+      - "<Questioning rule 1>"
+      - "<Questioning rule 2>"
+    follow_up_rules:
+      - "<Follow-up rule 1>"
+      - "<Follow-up rule 2>"
+```
+- **`max_questions`**: Set the maximum number of questions allowed.
+- **`policy`**: Define the overall questioning flow (e.g., increasing difficulty, no duplicates).
+- **`follow_up_rules`**: Specify how to probe deeper or handle incomplete answers.
+
+#### **Seed Question**
+Provide the initial question to kickstart the session:
+```yaml
+  seed_question: "<First question>"
+```
+
+#### **Grading Rubric**
+Specify the grading criteria:
+```yaml
+  rubric: |
+    <Grading criteria>
+```
+- Example: "Score from 0-10 based on problem-solving accuracy and explanation depth."
+
+---
+
+### **3. Interviewee Configuration**
+The `interviewee` section defines the simulated student or participant.
+
+#### **Basic Settings**
+```yaml
+interviewee:
+  name: "<Interviewee Name>"
+  model: "<Interviewee AI Model>"
+  client:
+    api_key: ${<API_KEY_VARIABLE>}
+```
+- **`name`**: Name of the participant (e.g., "Student").
+- **`model`**: Specify the AI model (e.g., `openai/gpt-4o-mini-2024-07-18`).
+
+#### **Instructions**
+Define the participant’s role, strengths, and challenges:
+```yaml
+  instructions: |
+    <Interviewee instructions here>
+```
+- Example: "You are a high school student who excels in Geometry but struggles with Algebra."
+
+---
+
+### **4. Session Configuration**
+Control session parameters, such as retries and initial messages:
+```yaml
+session:
+  max_questions: <Number>
+  max_retries: <Number>
+  initial_message: "<Message>"
+  initial_context:
+    interview_complete: <true/false>
+    current_topic: "<Topic>"
+    questions_asked: <Number>
+    assessment_notes: []
+```
+- **`max_questions`**: Limit the session length.
+- **`max_retries`**: Set how many retries are allowed.
+- **`initial_message`**: Customize the opening message.
+- **`initial_context`**: Define the starting context, such as the topic and initial notes.
+
+---
+
+### **5. Logging Configuration**
+Enable or disable logging and customize log file details:
+```yaml
+logging:
+  save_to_file: <true/false>
+  output_dir: "<Directory>"
+  filename_template: "<Filename format>"
+```
+- **`save_to_file`**: Set to `true` to save logs.
+- **`output_dir`**: Define the directory for logs.
+- **`filename_template`**: Use placeholders like `{timestamp}` for dynamic filenames.
+
+---
+
+### **6. Reporting Configuration**
+Control reporting options for the session:
+```yaml
+report:
+  save_to_file: <true/false>
+  output_dir: "<Directory>"
+  filename_template: "<Filename format>"
+```
+- Similar to the logging configuration, but for reports.
+
+---
+
+### **Customization Tips**
+- **Focus on Roles:** Clearly define interviewer and interviewee roles for clarity in behavior.
+- **Adapt Strategies:** Tailor hint and questioning strategies to align with the interview's goals.
+- **Contextual Seed Questions:** Use a relevant seed question to set the tone.
+- **Test Configuration:** Validate settings in a test environment to ensure smooth performance.
+- **Dynamic Variables:** Leverage placeholders (e.g., `${OPENAI_API_KEY}`, `{timestamp}`) for flexibility.
+
+---
+
+This guideline ensures a well-configured YAML file to facilitate customizable, focused interview sessions.
 
 ## 🎯 Advanced Interview
 
