@@ -13,21 +13,6 @@ Our framework includes a flexible pipeline that can be easily adapted to various
 5. [⚙️ Configuration](#️-configuration)
     - [📄 Example Configurations](#-example-configurations)
 6. [🔑 Guideline for Customizing the YAML File](#-guideline-for-customizing-the-yaml-file)
-    - [Interview Type](#1-interview-type)
-    - [Interviewer Configuration](#2-interviewer-configuration)
-        - [Basic Settings](#basic-settings)
-        - [Instructions](#instructions)
-        - [Hint Strategy](#hint-strategy)
-        - [Questioning Strategy For Follow-Up Questions](#questioning-strategy-for-follow-up-questions)
-        - [Seed Question](#seed-question)
-        - [Grading Rubric](#grading-rubric)
-    - [Interviewee Configuration](#3-interviewee-configuration)
-        - [Basic Settings](#basic-settings-1)
-        - [Instructions](#instructions-1)
-    - [Session Configuration](#4-session-configuration)
-    - [Logging Configuration](#5-logging-configuration)
-    - [Reporting Configuration](#6-reporting-configuration)
-    - [Customization Tips](#customization-tips)
 7. [Decontamination Strategies](#question-decontamination)
 8. [License](#license)
 
@@ -150,7 +135,21 @@ Refer to the following examples for creating your own configuration:
 ## 🔑 Guideline for Customizing the YAML File
 
 This guide explains how to customize the YAML file based on your needs to create and configure an effective interview session between an interviewer and an interviewee.
-
+    - [Interview Type](#1-interview-type)
+    - [Interviewer Configuration](#2-interviewer-configuration)
+        - [Basic Settings](#basic-settings)
+        - [Instructions](#instructions)
+        - [Hint Strategy](#hint-strategy)
+        - [Questioning Strategy For Follow-Up Questions](#questioning-strategy-for-follow-up-questions)
+        - [Seed Question](#seed-question)
+        - [Grading Rubric](#grading-rubric)
+    - [Interviewee Configuration](#3-interviewee-configuration)
+        - [Basic Settings](#basic-settings-1)
+        - [Instructions](#instructions-1)
+    - [Session Configuration](#4-session-configuration)
+    - [Logging Configuration](#5-logging-configuration)
+    - [Reporting Configuration](#6-reporting-configuration)
+    - [Customization Tips](#customization-tips)
 ---
 
 ### **1. Interview Type**
