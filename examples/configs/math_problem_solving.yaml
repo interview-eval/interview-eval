@@ -14,12 +14,13 @@ interviewer:
     Topics to cover: Algebra, Geometry, Basic Calculus
     
     Interview process:
-    1. Start with simple warm-up questions
-    2. Progress to more complex problems within the chosen topics
-    3. Ask the student to explain their thinking process
-    4. Provide hints if the student is stuck
-    5. Use conclude_interview() when you've assessed their understanding
-
+    1. Progress to more complex problems within the chosen topics
+    2. Ask the student to explain their thinking process
+    3. Provide hints about the solving method if the student is stuck, but do not give the answer directly.
+    4. Use conclude_interview() when you've assessed their understanding
+  # Feedback Strategy
+  hint_prompt_template: 
+    "Given the following, you have to give a hint to the interviewee to help them answer the question correctly. \nIf the {interviewee_name} makes repeated mistakes, give more hints to fix the mistake.\n"
   # Questioning Strategy
   strategy:
     max_questions: 10
@@ -28,8 +29,8 @@ interviewer:
       - "If student answers correctly, increase difficulty gradually"
       - "Do not throw duplicate questions"
       - "Ask for explanations to assess understanding depth"
-      - "Move to next topic after 2-3 questions or when mastery is shown"
     follow_up_rules:
+      - "Ask questions related to the concept of previous question revealed in previous logs."
       - "Ask for clarification if answer is incomplete"
       - "Request alternative solution methods"
       - "Probe for deeper understanding on correct answers"
@@ -51,8 +52,7 @@ interviewee:
   name: "Student"
   model: "openai/gpt-4o-mini-2024-07-18"
   client:
-    base_url: "https://openrouter.ai/api/v1"
-    api_key: ${OPENROUTER_API_KEY}
+    api_key: ${OPENAI_API_KEY}
   instructions: |
     You are a math student at the high school level.
     
@@ -61,17 +61,13 @@ interviewee:
     - Topics you find challenging: Calculus
     
     Guidelines:
-    - Show your work and explain your thinking process
-    - Ask for clarification if a question is unclear
-    - Be honest if you don't understand something
-    - Take your time to answer thoughtfully
-    - Use mathematical terminology appropriately
-    - Express confidence in topics you know well
-    - Show willingness to learn from mistakes
+    - Solve the problem.
+
 
 # Session Configuration
 session:
   max_questions: 3
+  max_retries: 2
   initial_message: "Hello! Let's begin with some math problems. Are you ready to start?"
   initial_context:
     interview_complete: false
@@ -84,4 +80,10 @@ logging:
   save_to_file: true
   output_dir: "interview_logs"
   filename_template: "interview_{timestamp}.log"  # {timestamp} will be replaced with actual timestamp
+
+# Reporting Configuration
+report:
+  save_to_file: true
+  output_dir: "interview_reports"
+  filename_template: "interview_{timestamp}.txt"  # {timestamp} will be replaced with actual timestamp
 
