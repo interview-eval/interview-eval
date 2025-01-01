@@ -289,24 +289,6 @@ report:
 - **Test Configuration:** Validate settings in a test environment to ensure smooth performance.
 - **Dynamic Variables:** Leverage placeholders (e.g., `${OPENAI_API_KEY}`, `{timestamp}`) for flexibility.
 
-
-## 🎯 Advanced Interview
-
-### Custom Interview Flows
-
-***Note: This feature is still under development and will be available in future releases.***
-
-`interview-eval` lets you define custom interview flows as directed graphs, where each node represents an interview state (like asking questions or evaluating responses) and edges represent possible transitions between states. With this feature, you can create complex interview scenarios with branching logic, follow-up questions, and adaptive feedback based on the interviewee's responses.
-
-Below is an example flow of interview, where the Interviewer evaluates the Interviewee's response and chooses to do one of the following actions: 
-- Ask a follow-up question (Deep Dive)
-- Move on to the next topic (Next Topic)
-- Ask for clarification (Challenge)
-- End the interview (Conclude)
-
-![Interview Flow](assets/interview-flow.png)
-
-
 ### Question Decontamination
 
 For users conducting benchmark-based interview (like GSM8K, MMLU, etc.), `interview-eval` provides functions to prevent test set contamination through three transformation strategies:
