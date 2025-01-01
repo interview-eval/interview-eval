@@ -46,7 +46,7 @@ pip install interview-eval
 - Progress tracking and maximum question limits
 - Customizable OpenAI client configuration
 
-## Basic Usage
+## 🛠️ Basic Usage
 
 - All you need is the below code snippet and your customized `config.yaml` file!
 
@@ -69,6 +69,7 @@ report_manager = InterviewReportManager(config=config_data)
 # Create and run interview
 runner = InterviewRunner(interviewer, student, config_data, logger, log_file_path, console, report_manager)
 results = runner.run()
+report_manager.generate_report(interviewer)
 ```
 
 ## ⚙️ Configuration
@@ -120,7 +121,7 @@ Refer to the following examples for creating your own configuration:
 - [Math Problem Solving](https://github.com/interview-eval/interview-eval/blob/main/examples/configs/math_problem_solving.yaml)
 - [Café Part-Time Job Scenario](https://github.com/interview-eval/interview-eval/blob/main/examples/configs/cafe_parttime.yaml)
 
-## **Guideline for Customizing the YAML File**
+## 🔑 Guideline for Customizing the YAML File
 
 This guide explains how to customize the YAML file based on your needs to create and configure an effective interview session between an interviewer and an interviewee.
 
