@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>LLM-as-an-Interviewer Replication 🎤📄 </h1>
+  <h1>LLM-as-an-Interviewer🎤📄 </h1>
   <p>
     <a href="https://arxiv.org/abs/2412.10424"><img src="https://img.shields.io/badge/Arxiv-2412.10424-green" alt="Paper"></a>
     <a href="https://github.com/interview-eval/interview-eval/tree/main"><img src="https://img.shields.io/badge/Github-InterviewEval-blue" alt="Dataset"></a>
