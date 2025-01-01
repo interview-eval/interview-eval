@@ -17,12 +17,13 @@ Our framework includes a flexible pipeline that can be easily adapted to various
 1. [🚀 Quick Start](#-quick-start)
 2. [📦 Installation](#-installation)
 3. [🌟 Features](#-features)
-4. [🛠️ Basic Usage](#️-basic-usage)
-5. [⚙️ Configuration](#️-configuration)
+4. [🖥️ Working Process](#-working-process)
+5. [🛠️ Basic Usage](#️-basic-usage)
+6. [⚙️ Configuration](#️-configuration)
     - [📄 Example Configurations](#-example-configurations)
-6. [🔑 Guideline for Customizing the YAML File](#-guideline-for-customizing-the-yaml-file)
-7. [🔄 Question Decontamination](#-question-decontamination)
-8. [Citation](#Citation)
+7. [🔑 Guideline for Customizing the YAML File](#-guideline-for-customizing-the-yaml-file)
+8. [🔄 Question Decontamination](#-question-decontamination)
+9. [Citation](#Citation)
 
 ## 🚀 Quick Start
 - Git Clone
@@ -65,7 +66,7 @@ pip install interview-eval
 - Progress tracking and maximum question limits
 - Customizable OpenAI client configuration
 
-## 🖥️ Working Process
+## 🖥️ Working Process
 
 - The interviewer and interviewee engage in a sequential conversation.  
 - The evaluation of the interviewee’s responses is also displayed (feedback is not disclosed to the interviewee).
