@@ -180,9 +180,19 @@ Define the approach to questioning:
 - **`follow_up_rules`**: Specify how to probe deeper or handle incomplete answers.
 
 #### **Seed Question**
-Provide the initial question to kickstart the session:
+
+Provide the initial question to kickstart the interview:
+
 ```yaml
   seed_question: "<First question>"
+```
+
+- If you are not using the existing benchmark dataset and prefer to define your own scenario (e.g., a café interview scenario), you can set your custom seed question here.
+- If you are using a benchmark dataset, the seed question can be dynamically assigned as follows:
+
+```python
+interviewer.seed_question = question['question']
+interviewer.seed_question_answer = question['solution']
 ```
 
 #### **Grading Rubric**
