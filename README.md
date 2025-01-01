@@ -95,6 +95,7 @@ interviewer:
     api_key: ${OPENAI_API_KEY}
   instructions: "Your interview guidelines..."
   rubric: "Evaluation criteria..."
+  
   strategy:
     policy: [...]
     follow_up_rules: [...]
@@ -141,10 +142,10 @@ This guide explains how to customize the YAML file based on your needs to create
 - [Interviewer Configuration](#2-interviewer-configuration)
     - [Basic Settings](#basic-settings)
     - [Instructions](#instructions)
-    - [Hint Strategy](#hint-strategy)
-    - [Questioning Strategy For Follow-Up Questions](#questioning-strategy-for-follow-up-questions)
+    - [hint_prompt_template](#hint-strategy)
+    - [strategy](#questioning-strategy-for-follow-up-questions)
     - [Seed Question](#seed-question)
-    - [Grading Rubric](#grading-rubric)
+    - [Rubric](#grading-rubric)
 - [Interviewee Configuration](#3-interviewee-configuration)
     - [Basic Settings](#basic-settings-1)
     - [Instructions](#instructions-1)
