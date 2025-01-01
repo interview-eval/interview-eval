@@ -1,9 +1,11 @@
-# LLM-as-an-Interviewer
+<div align="center">
+  <h1>LLM-as-an-Interviewer Replication 🎤📄 </h1>
   <p>
     <a href="https://arxiv.org/abs/2412.10424"><img src="https://img.shields.io/badge/Arxiv-2412.10424-green" alt="Paper"></a>
     <a href="https://github.com/interview-eval/interview-eval/tree/main"><img src="https://img.shields.io/badge/Github-InterviewEval-blue" alt="Dataset"></a>
     <a href="https://huggingface.co/interview-eval"><img src="https://img.shields.io/badge/Huggingface-InterviewEval-yellow" alt="Dataset"></a>
   </p>
+</div>  
 This is the official GitHub repository for [LLM-as-an-Interviewer: Beyond Static Testing Through Dynamic LLM Evaluation](https://arxiv.org/abs/2412.10424).
 
 LLM-as-an-Interviewer is an evaluation framework that assesses the capabilities of LLMs through an interview-style process. In this approach, the LLM acting as the interviewer evaluates other LLMs by providing feedback and asking follow-up questions, enabling a more comprehensive assessment of their capabilities.
