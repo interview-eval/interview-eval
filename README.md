@@ -83,7 +83,7 @@ interviewer:
   strategy:
     key_areas: [...]
     scoring_criteria: [...]
-  client:  # Optional OpenAI client configuration
+  client:
     api_key: "your-api-key"
 
 interviewee:
@@ -95,6 +95,17 @@ session:
   max_questions: 10
   max_retries: 2
   initial_context: {}
+
+logging:
+  save_to_file: true
+  output_dir: "logs"
+  filename_template: "session_{timestamp}.log"
+
+report:
+  save_to_file: true
+  output_dir: "reports"
+  filename_template: "report_{timestamp}.txt"
+
 ```
 
 ## **Guideline for Customizing the YAML File**
