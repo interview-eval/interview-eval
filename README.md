@@ -65,17 +65,28 @@ pip install interview-eval
 - Progress tracking and maximum question limits
 - Customizable OpenAI client configuration
 
-## 🖥️ Display Example
+## 🖥️ Working Process
 
 - The interviewer and interviewee engage in a sequential conversation.  
 - The evaluation of the interviewee’s responses is also displayed (feedback is not disclosed to the interviewee).
 
-### Process:
+### Interview Process:
 1. The first question is the **Seed Question** (`question1`).
 2. Follow-up questions (`question2`, ...) are provided thereafter.
 
-### Example Image:
+### Terminal Display Example:
 ![Terminal Display Example](https://github.com/interview-eval/interview-eval/blob/main/assets/display_ex.png)
+
+### 📄 Interview Report
+
+A report containing scores and a comprehensive summary of the interview is saved after the session.
+
+The report includes:
+- Detailed evaluation scores.
+- A summary of the interviewee's performance.
+- Examples of interview logs for each score range.
+
+This report can be configured to be saved automatically in the specified directory.
 
 
 ## 🛠️ Basic Usage
@@ -172,7 +183,7 @@ This guide explains how to customize the YAML file based on your needs to create
     - [Instructions](#instructions-1)
 - [Session Configuration](#4-session-configuration)
 - [Logging Configuration](#5-logging-configuration)
-- [Reporting Configuration](#6-reporting-configuration)
+- [Interview Report Configuration](#6-reporting-configuration)
 - [Customization Tips](#customization-tips)
 
 ---
@@ -321,8 +332,8 @@ logging:
 
 ---
 
-### **6. Reporting Configuration**
-Control reporting options for the session:
+### **6. Interview Report Configuration**
+Control Interview Report Saving options for the session:
 ```yaml
 report:
   save_to_file: <true/false>
