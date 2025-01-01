@@ -78,16 +78,22 @@ Create a YAML configuration file with the following structure:
 ```yaml
 interviewer:
   name: "Technical Interviewer"
+  model: "model name"
+  client:
+    api_key: ${OPENAI_API_KEY}
   instructions: "Your interview guidelines..."
   rubric: "Evaluation criteria..."
   strategy:
-    key_areas: [...]
-    scoring_criteria: [...]
-  client:
-    api_key: "your-api-key"
+    policy: [...]
+    follow_up_rules: [...]
+  seed_question: [...]
+  rubric: [...]
 
 interviewee:
   name: "Candidate"
+  model: "model name"
+  client:
+    api_key: ${OPENAI_API_KEY}
   instructions: "Interviewee behavior guidelines..."
 
 session:
@@ -119,7 +125,6 @@ Define the type of interview:
 ```yaml
 interview_type: <type>
 ```
-- Example: `base`, `advanced`, or any custom type.
 
 ---
 
@@ -136,7 +141,7 @@ interviewer:
 ```
 - **`name`**: Provide a name for the interviewer (e.g., "Teacher").
 - **`model`**: Specify the AI model to use (e.g., `gpt-4o-mini`).
-- **`api_key`**: Add the API key environment variable.
+- **`api_key`**: Add the API key environment variable. (e.g., `${OPENAI_API_KEY}`).
 
 #### **Instructions**
 Define the behavior and goals of the interviewer:
@@ -147,14 +152,18 @@ Define the behavior and goals of the interviewer:
 - Example: "You are a science interviewer assessing high school knowledge. Topics to cover: Biology, Physics."
 
 #### **Hint Strategy**
-Customize how the interviewer provides hints:
+
+This is the prompt used when the interviewer provides hints (feedback) to the interviewee. Customize how the interviewer provides hints:
 ```yaml
   hint_prompt_template: |
     "<Hint strategy description>"
 ```
-- Example: "Provide hints to help solve the problem without directly giving away the answer."
+If not specified, it will default to the following:
+- Default: "Given the following, you have to give a hint to the interviewee to help them answer the question correctly. \nIf the {interviewee_name} makes repeated mistakes, give more hints to fix the mistake.\n"
 
 #### **Questioning Strategy For Follow-Up Questions**
+This is the instruction used when the interviewer provides follow-up questions to the interviewee.
+
 Define the approach to questioning:
 ```yaml
   strategy:
