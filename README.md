@@ -17,7 +17,7 @@ Our framework includes a flexible pipeline that can be easily adapted to various
 1. [🚀 Quick Start](#-quick-start)
 2. [📦 Installation](#-installation)
 3. [🌟 Features](#-features)
-4. [🖥️ Working Process](#-working-process)
+4. [🖥️ Working Process](#-features)
 5. [🛠️ Basic Usage](#️-basic-usage)
 6. [⚙️ Configuration](#️-configuration)
     - [📄 Example Configurations](#-example-configurations)
