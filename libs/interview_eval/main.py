@@ -1,6 +1,6 @@
 import click
 from dotenv import load_dotenv
-from interview_eval import Interviewee, Interviewer, InterviewRunner
+from interview_eval import Interviewee, Interviewer, InterviewRunner, InterviewReportManager
 from interview_eval.utils import console, load_config, setup_logging
 from rich.panel import Panel
 
@@ -30,17 +30,25 @@ def main(config: str, verbose: bool):
             padding=(1, 2),
         )
     )
-
+    existing_data = [
+    {"question": "What is 5 + 7?", "solution": "12"},
+    {"question": "Solve for x: 2x + 3 = 7", "solution": "x = 2"}
+]
     try:
+
         config_data = load_config(config)
-        logger = setup_logging(config_data, verbose)
-
-        interviewer = Interviewer(config=config_data, name="Teacher")
+        interviewer = Interviewer(config=config_data, name="Interviewer")
         student = Interviewee(config=config_data, name="Student")
-
-        interview = InterviewRunner(interviewer, student, config_data, logger, console)
-        interview.run()
-
+        report_manager = InterviewReportManager(config=config_data)
+        for question in existing_data:
+            logger, log_file_path = setup_logging(config_data, verbose)
+            report_manager.start_new_interview(log_file_path)
+            interviewer.seed_question = question['question']
+            interviewer.seed_question_answer = question['solution']
+            interview = InterviewRunner(interviewer, student, config_data, logger, console, report_manager)
+            interview.run()
+            report_manager.save_to_csv('test.csv')
+        report_manager.generate_report(interviewer)
     except KeyboardInterrupt:
         console.print("\n[warning]Interview session interrupted by user[/warning]")
     except Exception as e:
