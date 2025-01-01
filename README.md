@@ -113,6 +113,12 @@ report:
   filename_template: "report_{timestamp}.txt"
 
 ```
+### 📄 Example Configurations
+
+Refer to the following examples for creating your own configuration:
+
+- [Math Problem Solving](https://github.com/interview-eval/interview-eval/blob/main/examples/configs/math_problem_solving.yaml)
+- [Café Part-Time Job Scenario](https://github.com/interview-eval/interview-eval/blob/main/examples/configs/cafe_parttime.yaml)
 
 ## **Guideline for Customizing the YAML File**
 
@@ -191,6 +197,7 @@ Provide the initial question to kickstart the interview:
 - If you are using a benchmark dataset, the seed question can be dynamically assigned as follows:
 
 ```python
+interviewer = Interviewer(config=config_data, name="Interviewer")
 interviewer.seed_question = question['question']
 interviewer.seed_question_answer = question['solution']
 ```
