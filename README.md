@@ -4,6 +4,32 @@ This is the official GitHub repository for [LLM-as-an-Interviewer: Beyond Static
 LLM-as-an-Interviewer is an evaluation framework that assesses the capabilities of LLMs through an interview-style process. In this approach, the LLM acting as the interviewer evaluates other LLMs by providing feedback and asking follow-up questions, enabling a more comprehensive assessment of their capabilities.
 
 Our framework includes a flexible pipeline that can be easily adapted to various tasks by incorporating a customized evaluation rubric.
+## Table of Contents
+
+1. [🚀 Quick Start](#-quick-start)
+2. [📦 Installation](#-installation)
+3. [🌟 Features](#-features)
+4. [🛠️ Basic Usage](#️-basic-usage)
+5. [⚙️ Configuration](#️-configuration)
+    - [📄 Example Configurations](#-example-configurations)
+6. [🔑 Guideline for Customizing the YAML File](#-guideline-for-customizing-the-yaml-file)
+    - [Interview Type](#1-interview-type)
+    - [Interviewer Configuration](#2-interviewer-configuration)
+        - [Basic Settings](#basic-settings)
+        - [Instructions](#instructions)
+        - [Hint Strategy](#hint-strategy)
+        - [Questioning Strategy For Follow-Up Questions](#questioning-strategy-for-follow-up-questions)
+        - [Seed Question](#seed-question)
+        - [Grading Rubric](#grading-rubric)
+    - [Interviewee Configuration](#3-interviewee-configuration)
+        - [Basic Settings](#basic-settings-1)
+        - [Instructions](#instructions-1)
+    - [Session Configuration](#4-session-configuration)
+    - [Logging Configuration](#5-logging-configuration)
+    - [Reporting Configuration](#6-reporting-configuration)
+    - [Customization Tips](#customization-tips)
+7. [Decontamination Strategies](#question-decontamination)
+8. [License](#license)
 
 ## 🚀 Quick Start
 - Git Clone
