@@ -252,9 +252,6 @@ report:
 - **Test Configuration:** Validate settings in a test environment to ensure smooth performance.
 - **Dynamic Variables:** Leverage placeholders (e.g., `${OPENAI_API_KEY}`, `{timestamp}`) for flexibility.
 
----
-
-This guideline ensures a well-configured YAML file to facilitate customizable, focused interview sessions.
 
 ## 🎯 Advanced Interview
 
