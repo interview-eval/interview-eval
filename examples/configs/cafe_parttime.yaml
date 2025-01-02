@@ -60,7 +60,7 @@ interviewee:
 # Session Configuration
 session:
   max_questions: 5
-  initial_message: "안녕하세요! 카페 알바 면접에 오신 것을 환영합니다. 시작할까요?"
+  initial_message: "Hello! Welcome to the cafe part-time job interview. Shall we start?"
   initial_context:
     interview_complete: false
     current_topic: "introduction"
