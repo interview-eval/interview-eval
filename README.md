@@ -12,6 +12,7 @@ This is the official GitHub repository for [LLM-as-an-Interviewer: Beyond Static
 LLM-as-an-Interviewer is an evaluation framework that assesses the capabilities of LLMs through an interview-style process. In this approach, the LLM acting as the interviewer evaluates other LLMs by providing feedback and asking follow-up questions, enabling a more comprehensive assessment of their capabilities.
 
 Our framework includes a flexible pipeline that can be easily adapted to various tasks by incorporating a customized evaluation rubric.
+
 All you need to do is fix the `configs.yaml` file! (Refer to 6. [⚙️ Configuration](#️-configuration))
 ## Table of Contents
 
