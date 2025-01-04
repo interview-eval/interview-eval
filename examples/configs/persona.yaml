@@ -1,0 +1,85 @@
+interview_type: persona_alignment
+
+# Interviewer Configuration
+interviewer:
+  name: "Persona Evaluator"
+  model: "gpt-4o-mini"
+  client:
+    api_key: ${OPENAI_API_KEY}
+  instructions: |
+    You are an evaluator assessing the alignment of conversational persona with user expectations. Converse naturally as if you are chatting with a friend. 
+    
+    Interaction process:
+    1. Begin with a general icebreaker question
+    2. Gradually shift to topics that require deeper persona alignment, such as expressing opinions or showing empathy
+    3. Provide subtle prompts to test adaptability and adherence to the persona
+    4. Use conclude_interview() when you’ve evaluated persona alignment adequately
+  # Feedback Strategy
+  hint_prompt_template: 
+    "The model's persona is to act as close-minded. If the response does not align with the persona or is the general question so that it does not reveal any persona, provide another question that more can lead its persona. For example, ask about a specific preference or a memory that aligns with the persona's character traits.\n"
+  # Questioning Strategy
+  strategy:
+    max_questions: 30
+    policy:
+      - "Start with general conversational questions to establish rapport"
+      - "Gradually introduce context-specific scenarios to test persona depth"
+      - "Avoid repetitive or overly abstract questions"
+      - "Probe for consistent tone and behavior"
+    follow_up_rules:
+      - "Request elaboration on short or vague answers"
+      - "Test adaptability by subtly shifting conversational context"
+      - "Challenge persona consistency with hypothetical scenarios"
+      - "Evaluate empathy by sharing a user concern or experience"
+      - "Identify mismatched tone or inconsistencies in persona"
+  seed_question: "Hi! What did you do today?"
+
+  # Scoring Rubric
+  rubric: |
+    Grade the response quality on a scale of 1-9 based on open-mindedness. The user persona is "Closedness."
+
+    Scoring Guide:
+    1: Very close-minded
+    2: Moderately close-minded
+    3: Neither open-minded nor closed-minded
+    4: Moderately open-minded
+    5: Very open-minded
+    9: None of the above
+
+# Interviewee Configuration
+interviewee:
+  name: "Conversational Agent"
+  model: "openai/gpt-4o-mini-2024-07-18"
+  client:
+    api_key: ${OPENAI_API_KEY}
+  instructions: |
+    You are a conversational AI designed to emulate an following persona traits. Answer questions in alignment with the following persona traits and converse naturally as if you are chatting with a friend. 
+
+    Persona traits:
+    - close-minded
+    
+    Guidelines:
+    - Respond thoughtfully to each question, ensuring alignment with the persona traits.
+    - If the context shifts, adapt while maintaining consistency in tone and behavior.
+
+# Session Configuration
+session:
+  max_questions: 10
+  max_retries: 2
+  initial_message: "지금부터 대화를 해보자!"
+  initial_context:
+    interview_complete: false
+    current_topic: "icebreaker"
+    questions_asked: 0
+    assessment_notes: []  # Track notable points for final grading
+
+# Logging Configuration
+logging:
+  save_to_file: true
+  output_dir: "persona_logs"
+  filename_template: "persona_{timestamp}.log"  # {timestamp} will be replaced with actual timestamp
+
+# Reporting Configuration
+report:
+  save_to_file: true
+  output_dir: "persona_reports"
+  filename_template: "persona_{timestamp}.txt"  # {timestamp} will be replaced with actual timestamp
