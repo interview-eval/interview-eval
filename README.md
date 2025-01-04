@@ -167,6 +167,7 @@ Refer to the following examples for creating your own configuration:
 
 - [Math Problem Solving](https://github.com/interview-eval/interview-eval/blob/main/examples/configs/math_problem_solving.yaml)
 - [Café Part-Time Job Scenario](https://github.com/interview-eval/interview-eval/blob/main/examples/configs/cafe_parttime.yaml)
+- [Persona Alignment](https://github.com/interview-eval/interview-eval/blob/main/examples/configs/persona.yaml)
 
 ## 🔑 Guideline for Customizing the YAML File
 
