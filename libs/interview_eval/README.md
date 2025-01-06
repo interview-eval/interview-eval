@@ -1,11 +1,121 @@
-# interview-eval
+<div align="center">
+  <h1>LLM-as-an-Interviewer🎤📄 </h1>
+  <p>
+    <a href="https://arxiv.org/abs/2412.10424"><img src="https://img.shields.io/badge/Arxiv-InterviewEval-green" alt="Paper"></a>
+    <a href="https://github.com/interview-eval/interview-eval/tree/main"><img src="https://img.shields.io/badge/Github-InterviewEval-blue" alt="Dataset"></a>
+    <a href="https://huggingface.co/interview-eval"><img src="https://img.shields.io/badge/Huggingface-InterviewEval-yellow" alt="Dataset"></a>
+  </p>
+</div>  
 
-An automated interview evaluation system that simulates technical interviews using AI agents. The system consists of an AI interviewer and interviewee, conducting structured conversations based on predefined rubrics and strategies.
+This is the official GitHub repository for [LLM-as-an-Interviewer: Beyond Static Testing Through Dynamic LLM Evaluation](https://arxiv.org/abs/2412.10424).
+
+LLM-as-an-Interviewer is an evaluation framework that assesses the capabilities of LLMs through an interview-style process. In this approach, the LLM acting as the interviewer evaluates other LLMs by providing feedback and asking follow-up questions, enabling a more comprehensive assessment of their capabilities.
+
+Our framework includes a flexible pipeline that can be easily adapted to various tasks by incorporating a customized evaluation rubric.
+
+All you need to do is fix the `configs.yaml` file! (Refer to 6. [⚙️ Configuration](#️-configuration))
+## Table of Contents
+
+1. [🚀 Quick Start](#-quick-start)
+2. [📦 Installation](#-installation)
+3. [🌟 Features](#-features)
+4. [🖥️ Working Process](#-features)
+5. [🛠️ Basic Usage](#️-basic-usage)
+6. [⚙️ Configuration](#️-configuration)
+    - [📄 Example Configurations](#-example-configurations)
+7. [🔑 Guideline for Customizing the YAML File](#-guideline-for-customizing-the-yaml-file)
+8. [🔄 Question Decontamination](#-question-decontamination)
+9. [Citation](#Citation)
+
+## 🚀 Quick Start
+- Git Clone
+- Install requirements
+```
+"openai>=1.55.2",
+"python-dotenv>=1.0.1",
+"pyyaml>=6.0.2",
+"rich>=13.9.4",
+"click"
+```
+
+- Setup API key in .env file
+```
+OPENAI_API_KEY=YOUR_OPENAI_API_KEY
+OPENROUTER_API_KEY=YOUR_OPENROUTER_API_KEY
+```
+
+
+- ***Note:*** To test local models, you can use [vLLM serve](https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html?ref=blog.mozilla.ai) to launch the OpenAI compatible server.
+
+
+- Run the following command to start the interview
+```bash
+python libs/interview_eval/main.py --config examples/configs/math_problem_solving.yaml
+```
 
 ## 📦 Installation
 
 ```bash
 pip install interview-eval
+```
+
+## 🌟 Features
+
+- AI-powered interviewer and interviewee agents
+- Configurable interview parameters and evaluation rubrics
+- Real-time conversation display with rich formatting
+- Detailed scoring and feedback system
+- Progress tracking and maximum question limits
+- Customizable OpenAI client configuration
+
+## 🖥️ Working Process
+
+- The interviewer and interviewee engage in a sequential conversation.  
+- The evaluation of the interviewee’s responses(as a feedback agent) is also displayed (feedback is not disclosed to the interviewee).
+
+### Interview Process:
+1. The first question is the **Seed Question** (`question1`).
+2. Follow-up questions (`question2`, ...) are provided thereafter.
+
+### Terminal Display Example:
+![Terminal Display Example](https://github.com/interview-eval/interview-eval/blob/main/assets/display_ex.png)
+
+### 📄 Interview Report
+
+A report containing scores and a comprehensive summary of the interview is saved after the session.
+
+The report includes:
+- Detailed evaluation scores.
+- A summary of the interviewee's performance.
+- Examples of interview logs for each score range.
+
+This report can be configured to be saved automatically in the specified directory.
+
+
+## 🛠️ Basic Usage
+
+- All you need is the below code snippet and your customized `config.yaml` file!
+
+```python
+from interview_eval import InterviewRunner, Interviewer, Interviewee, InterviewReportManager
+from interview_eval.utils import console, load_config, setup_logging
+import logging
+import yaml
+
+# Load configuration
+config = load_config("config.yaml")
+
+# Setup logging and console
+logger, log_file_path = setup_logging(config_data, verbose)
+
+# Initialize agents
+interviewer = Interviewer(config=config_data, name="Interviewer")
+interviewee = Interviewee(config=config_data, name="Student")
+report_manager = InterviewReportManager(config=config_data)
+# Create and run interview
+runner = InterviewRunner(interviewer, student, config_data, logger, log_file_path, console, report_manager)
+results = runner.run()
+report_manager.generate_report(interviewer)
 ```
 
 ## ⚙️ Configuration
@@ -57,6 +167,7 @@ Refer to the following examples for creating your own configuration:
 
 - [Math Problem Solving](https://github.com/interview-eval/interview-eval/blob/main/examples/configs/math_problem_solving.yaml)
 - [Café Part-Time Job Scenario](https://github.com/interview-eval/interview-eval/blob/main/examples/configs/cafe_parttime.yaml)
+- [Persona Alignment](https://github.com/interview-eval/interview-eval/blob/main/examples/configs/persona.yaml)
 
 ## 🔑 Guideline for Customizing the YAML File
 
@@ -290,4 +401,17 @@ decontaminated = batch_decontaminate(
     method="modifying",
     model="gpt-4"
 )
+```
+## Citation
+
+```
+@misc{kim2024llmasaninterviewer,
+      title={LLM-as-an-Interviewer: Beyond Static Testing Through Dynamic LLM Evaluation}, 
+      author={Eunsu Kim and Juyoung Suk and Seungone Kim and Niklas Muennighoff and Dongkwan Kim and Alice Oh},
+      year={2024},
+      eprint={2412.10424},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2412.10424}, 
+}
 ```
