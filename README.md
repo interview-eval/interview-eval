@@ -405,13 +405,5 @@ decontaminated = batch_decontaminate(
 ## Citation
 
 ```
-@misc{kim2024llmasaninterviewer,
-      title={LLM-as-an-Interviewer: Beyond Static Testing Through Dynamic LLM Evaluation}, 
-      author={Eunsu Kim and Juyoung Suk and Seungone Kim and Niklas Muennighoff and Dongkwan Kim and Alice Oh},
-      year={2024},
-      eprint={2412.10424},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL},
-      url={https://arxiv.org/abs/2412.10424}, 
-}
+
 ```
